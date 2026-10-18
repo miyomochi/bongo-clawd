@@ -1,0 +1,6 @@
+{
+  "identifier": "local-windows",
+  "description": "Local companion and settings only; no file, shell, or network frontend access",
+  "windows": ["main", "settings"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten", "core:window:allow-start-dragging"]
+}

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · 小工位设置</title><link rel="stylesheet" href="settings.css"></head>
+<body>
+<header><div class="mark" aria-hidden="true">▣</div><div><span class="eyebrow">LITTLE PAWS, BIG WORK.</span><h1>小蟹的小工位 · Lite</h1><p>调到舒服的大小，让 Clawd 陪你工作。</p></div></header>
+<main>
+<section class="intro"><strong>先认识一下小家伙</strong><p>在其他应用打字、移动鼠标，小蟹也会跟着啪嗒。按住本体或键盘就能拖走；右键或托盘图标可随时打开菜单。</p><p>只响应物理键位和鼠标动作，不读取或保存你输入的文字。</p></section>
+<section><div class="section-title"><h2>外观与位置</h2><span>即时生效</span></div>
+<label class="range-label" for="scale">小蟹大小 <output id="scale-output" for="scale">100%</output></label>
+<input id="scale" type="range" min="60" max="160" step="1" value="100"><div class="range-hints"><span>60%</span><button id="reset-size" type="button">恢复 100%</button><span>160%</span></div>
+<label class="check"><span>始终置顶<small>在其他窗口前陪你</small></span><input id="alwaysOnTop" type="checkbox" checked></label>
+<label class="check"><span>显示顶部栏<small>连接状态、隐藏与设置入口</small></span><input id="showTopBar" type="checkbox" checked></label>
+<label class="check"><span>显示底部栏<small>动作提示与暂停按钮</small></span><input id="showBottomBar" type="checkbox" checked></label>
+<p class="hint">上下栏都关闭，就只留下小蟹。右键小蟹或使用托盘菜单，可重新打开设置。</p></section>
+<section><h2>休息与睡眠</h2>
+<label class="check"><span>空闲时自动睡眠<small>先偷偷看看，再伸懒腰、打个盹</small></span><input id="sleepEnabled" type="checkbox" checked></label>
+<label class="number-label" for="sleepSeconds">没有键鼠活动 <span><input id="sleepSeconds" type="number" value="90" min="30" max="3600" step="1" inputmode="numeric"> 秒后睡着</span></label>
+<p class="hint" id="sleep-note">默认 90 秒；可设 30～3600 秒。新的键鼠活动会重新计时，睡着后会被惊醒。</p>
+</section>
+<section><h2>启动与说明</h2><label class="check"><span>启动时显示本页<small>关闭后，仍可从设置或托盘回来</small></span><input id="showOnStartup" type="checkbox" checked></label><p class="hint">在下方暂停可暂时断开全局联动。隐藏窗口会留在托盘；完全退出请用托盘菜单。这是轻量对比候选版，配置与 Electron 版分开保存。</p><button id="toggle-input" type="button" class="secondary">暂停全局联动</button></section>
+</main><footer><span id="save-status" role="status" aria-live="polite">设置会自动保存</span><button id="done" type="button" class="primary">让小蟹开工</button></footer>
+<script src="lite-bridge.js"></script><script src="settings-renderer.js"></script></body></html>

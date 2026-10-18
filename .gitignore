@@ -1,0 +1,14 @@
+/dist/
+/**/target/
+/node_modules/
+*.zip
+
+/src-tauri/gen/
+/core-tests/target/
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep the reviewed portable package available for direct download.
+!/downloads/
+!/downloads/Bongo-Clawd-Lite-Windows-x64.zip

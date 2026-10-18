@@ -1,0 +1,12 @@
+{
+  "core/clawd-input.js": "62a648a79ab7498f3e51b54b14c4ef881102a45848a05753b362b64745a0ca2d",
+  "core/clawd-demo.js": "76a8da55eaba233f96f0886058faec28725d8586e7ec29e7fd67a45eefefe739",
+  "core/rig-data.json": "0adfbab39ccc01e77f28ad5646a89e5a4f403bf9b461a8bf307c63ce58fbde07",
+  "core/clawd-controller.js": "0cba89205d642b2f9939ac0fa465d83ae71c8c0a394a9152bdcf9676acb8ce2a",
+  "core/clawd-renderer.js": "796dabeb4abf04203ca23bf5459ec334124dc89db324b560b0979ffee04057fe",
+  "core/clawd-behavior.js": "5ff61bd7c415fac8753502ab1b2b9c49a5f22bba2310e8188cc8e71f1776731b",
+  "core/clawd-sleep.js": "d73f77acb2c5e92d9d657d4e8ab54a377bb3b24c5cfa79991e906acea6b80627",
+  "core/clawd-base.svg": "0cfa1a8832bf4c7780af6bad1cfb268e593bc48cdf9daf6a27edd49ef56fdbae",
+  "core/clawd.bundle.js": "7a3b8e67b5b1c8dedd13224dbb7f55d626934b49d043b477ae4663803e6862a5",
+  "core/clawd-wake.js": "168fa9e57a70f8760ef1c72a3cb8231e81ef248da2940d2f1a7306fa8f1b57a6"
+}
