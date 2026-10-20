@@ -27,7 +27,7 @@ metadata = {
     'version': '0.2.1', 'exe_bytes': len(exe),
     'exe_sha256': hashlib.sha256(exe).hexdigest(),
     'runtime_bundled': False, 'runtime': 'System Microsoft Edge WebView2',
-    'windows_runtime_tested': False,
+    'windows_runtime_tested': json.loads((root/'VALIDATION-RESULTS.json').read_text()).get('checks', {}).get('windows_runtime') == 'user_reported_passed',
     'checks': json.loads((root/'VALIDATION-RESULTS.json').read_text()).get('checks', {}),
     'size_note': 'Portable file bytes exclude system WebView2 and user configuration/cache. Sum of file sizes, not filesystem allocation.',
 }

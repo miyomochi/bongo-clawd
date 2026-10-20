@@ -7,11 +7,13 @@
     "candidate_assets": 27,
     "icon_assets": 3,
     "windows_x64_cross_build": "passed",
-    "windows_runtime": "pending user test",
+    "windows_runtime": "user_reported_passed",
     "installer": "NSIS compile, extraction and all payload file comparisons passed",
     "chromium_bridge_checks": "not run: browser launch blocked by socket permissions",
     "mirror_text": "workstation and controls mirrored; labels counter-mirrored inside their moving frames; statistics retain reversed perspective",
-    "update_manifest": "published metadata endpoint verified; semantic version and download URL validation covered by tests"
+    "update_manifest": "published metadata endpoint verified; semantic version and download URL validation covered by tests",
+    "windows_runtime_note": "User confirmed checks passed on 2026-10-20; detailed device matrix not recorded",
+    "release_payload": "installer and portable EXE identical"
   },
   "toolchain": {
     "rust": "1.99.1",
