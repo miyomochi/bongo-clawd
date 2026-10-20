@@ -174,7 +174,7 @@
     Promise.resolve(bridge.drag?.()).catch(()=>{}).finally(()=>{nativeDragging=false;});
   });
   function releaseGesture(e,cancelled=false){
-    if(!gesture||e.pointerId!==gesture.id)return;
+    if(!gesture||e.pointerId!==gesture.id||(!cancelled&&e.button!==0))return;
     const g=gesture;gesture=null;
     if(root.hasPointerCapture?.(e.pointerId))root.releasePointerCapture(e.pointerId);
     if(!cancelled&&g.body&&Math.hypot(e.clientX-g.x,e.clientY-g.y)<=6&&performance.now()-g.at<=300

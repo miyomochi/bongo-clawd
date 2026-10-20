@@ -296,3 +296,9 @@ test('desktop drag, long press, right click and pointer cancellation never trigg
  pointer(s,body,'pointerdown');pointer(s,body,'pointercancel');pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
  s.destroy();assert.equal(s.timers.size,0);
 });
+
+test('a secondary-button release cannot complete a pending left tap',()=>{
+ const s=setup(),body=s.document.querySelector('#body-motion');
+ pointer(s,body,'pointerdown');pointer(s,body,'pointerup',{button:2});assert.equal(s.c.getReaction(),null);
+ pointer(s,body,'pointercancel');s.destroy();assert.equal(s.timers.size,0);
+});
