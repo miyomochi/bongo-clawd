@@ -54,7 +54,7 @@ pub fn uninstall(app: &tauri::AppHandle) -> Result<(), String> {
 #[cfg(windows)]
 mod native {
     use std::{ffi::c_void, path::PathBuf, ptr::{null, null_mut}};
-    use windows_sys::Win32::{Foundation::*, Networking::WinHttp::*, System::Registry::*, UI::{Shell::ShellExecuteW, WindowsAndMessaging::*}};
+    use windows_sys::Win32::{Foundation::*, Networking::WinHttp::*, System::{Diagnostics::Debug::MessageBeep, Registry::*}, UI::{Shell::ShellExecuteW, WindowsAndMessaging::*}};
     const RUN: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
     const UNINSTALL: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\BongoClawd";
     fn wide(s: &str) -> Vec<u16> { s.encode_utf16().chain(Some(0)).collect() }
