@@ -90,7 +90,7 @@
     ctx.lookLimit=1+Math.floor(Math.random()*2); ctx.queueLook();
     if (!ctx.reduceMotion) ctx.scheduleBlink();
     return {
-      press:ctx.press, release:ctx.release, tap:ctx.tap, moveMouse:ctx.moveMouse,mouseButton:ctx.mouseButton,
+      press:ctx.press, release:ctx.release, tap:ctx.tap, moveMouse:ctx.moveMouse,mouseButton:ctx.mouseButton,stopMouse:ctx.stopMouse,
       openAccessoryMenu:ctx.openAccessoryMenu,selectAccessory:ctx.selectAccessory,closeAccessoryMenu:ctx.closeAccessoryMenu,restoreAccessory:ctx.restoreAccessory,setPaused,
       clearAll,configure,resumeIdle:()=>{ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();ctx.renderBody();}, showSunglasses:ctx.startCool,showHappy:ctx.startHappy,showDream:ctx.startDream, lookAround:ctx.startLook, sleep:ctx.startSleep, wake:ctx.startWake,
       getState:()=>({

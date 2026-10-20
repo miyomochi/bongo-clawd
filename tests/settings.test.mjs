@@ -31,3 +31,10 @@ test('failed autostart write restores the actual checkbox and reports failure',a
   assert.match(s.document.getElementById('system-status').textContent,/registry denied/);
   s.notify({installed:false});assert.match(s.document.getElementById('install-note').textContent,/便携版/);
 });
+
+test('appearance can persist the original short-hand mode and restore directional mode',async()=>{
+ const s=setup();await flush();assert.equal(s.document.getElementById('directionalArms').checked,true);
+ s.change('directionalArms',false);await flush();assert.equal(s.calls[0][1].directionalArms,false);
+ s.notify({directionalArms:false});assert.equal(s.document.getElementById('directionalArms').checked,false);
+ s.change('directionalArms',true);await flush();assert.equal(s.calls[1][1].directionalArms,true);
+});

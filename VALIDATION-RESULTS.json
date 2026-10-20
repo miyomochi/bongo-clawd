@@ -1,27 +1,12 @@
 {
   "date": "2026-10-20",
-  "version": "0.2.1",
+  "version": "0.3.0",
+  "channel": "stable",
   "checks": {
-    "node_animation_and_desktop": 86,
-    "rust_core": 18,
-    "candidate_assets": 27,
-    "icon_assets": 3,
-    "windows_x64_cross_build": "passed",
-    "windows_runtime": "user_reported_passed",
-    "installer": "NSIS compile, extraction and all payload file comparisons passed",
-    "chromium_bridge_checks": "not run: browser launch blocked by socket permissions",
-    "mirror_text": "workstation and controls mirrored; labels counter-mirrored inside their moving frames; statistics retain reversed perspective",
-    "update_manifest": "published metadata endpoint verified; semantic version and download URL validation covered by tests",
-    "windows_runtime_note": "User confirmed checks passed on 2026-10-20; detailed device matrix not recorded",
-    "release_payload": "installer and portable EXE identical"
+    "frontend": "passed locally; animation, desktop, settings, gesture event routes",
+    "rust_core": "pending Windows build",
+    "windows_runtime": "not_run_for_this_version",
+    "installer": "pending Windows build"
   },
-  "toolchain": {
-    "rust": "1.99.1",
-    "tauri": "2.12.4",
-    "llvm": "llvm-mingw 20260616",
-    "sysroot_release": "2026-01-16",
-    "sysroot_sha256": "ba765d78c02fee46564ec1c4a8d711c828260ece21627721e4d95a0161ae0894",
-    "linker": "Rust bundled LLD 23.1.1"
-  },
-  "build_duration": "1m 19s"
+  "note": "0.2.1 runtime approval does not apply to 0.3.0."
 }

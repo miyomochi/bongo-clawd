@@ -9,7 +9,7 @@ function setup(random=.2,preferences={}){
   let now=0,id=0,inputListener,stateListener,accessoryListener;const timers=new Map();
   const set=(fn,ms=0)=>{timers.set(++id,{fn,at:now+ms});return id;};
   const clear=id=>timers.delete(id);const math=Object.create(Math);math.random=()=>random;
-  const saved={phase:'listening',enabled:true,running:true,accessory:'none',...preferences};
+  const saved={phase:'listening',enabled:true,running:true,accessory:'none',directionalArms:false,...preferences};
   let failSave=false;
   const notify=patch=>{Object.assign(saved,patch);stateListener?.({...saved});};
   window.clawdDesktop={
@@ -23,6 +23,7 @@ function setup(random=.2,preferences={}){
   };
   const context=vm.createContext({window,document,Math:math,performance:{now:()=>now},setTimeout:set,clearTimeout:clear,requestAnimationFrame:fn=>set(()=>fn(now),16),cancelAnimationFrame:clear});
   vm.runInContext(fs.readFileSync(new URL('../web/core/clawd.bundle.js',import.meta.url),'utf8'),context);
+  for(const file of ['clawd-reach','clawd-reactions'])vm.runInContext(fs.readFileSync(new URL('../web/core/'+file+'.js',import.meta.url),'utf8'),context);
   vm.runInContext(fs.readFileSync(new URL('../web/desktop-renderer.js',import.meta.url),'utf8'),context);
   const advance=dt=>{const end=now+dt;let n=0;while(true){let first;for(const [i,t] of timers)if(t.at<=end&&(!first||t.at<first[1].at))first=[i,t];if(!first)break;now=first[1].at;timers.delete(first[0]);first[1].fn();assert(++n<100000);}now=end;};
   return {window,document,c:window.clawdDesktopController,timers,advance,saved,failSave:()=>{failSave=true;},openAccessories:()=>accessoryListener(),click:selector=>document.querySelector(selector).dispatchEvent(new window.Event('click',{bubbles:true})),input:v=>inputListener(v),state:v=>notify(v),destroy:()=>window.dispatchEvent(new window.Event('beforeunload'))};
@@ -265,5 +266,33 @@ test('mirror toggles the workstation without rewriting statistics or speech',asy
  s.state({mirrored:false});assert(!root.classList.contains('is-mirrored'));
  s.state({mirrored:true,sideButtons:false});assert(root.classList.contains('is-mirrored'));assert(root.classList.contains('no-side'));
  assert.equal(s.document.querySelector('[data-statistics-total]').textContent,'1234');
+ s.destroy();assert.equal(s.timers.size,0);
+});
+
+function pointer(s,target,type,props={}){
+ const e=new s.window.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerId:1,button:0,clientX:100,clientY:100,...props});target.dispatchEvent(e);
+}
+test('directional arms are optional and preference updates keep the chosen animation',()=>{
+ const s=setup(.2,{directionalArms:true});assert(s.c.getReachEnabled());
+ s.input({type:'key',code:'KeyA',down:true});s.advance(80);assert(s.document.querySelector('[data-reaching-arm]'));
+ s.state({directionalArms:false});assert.equal(s.c.getReachEnabled(),false);
+ s.input({type:'key',code:'KeyA',down:false});s.advance(300);s.input({type:'key',code:'KeyJ',down:true});s.advance(80);
+ assert.equal(s.document.querySelector('[data-reaching-arm]'),null);s.destroy();assert.equal(s.timers.size,0);
+});
+test('desktop body tap owns raw mouse input, plays a reaction, and real typing interrupts it',()=>{
+ const s=setup(),body=s.document.querySelector('#body-motion');
+ pointer(s,body,'pointerover');s.input({type:'move',dx:4,dy:2});s.advance(20);assert.equal(s.c.getState().mouse,false);
+ pointer(s,body,'pointerdown');s.input({type:'button',button:0,down:true});s.advance(80);
+ pointer(s,body,'pointerup');assert(s.c.getReaction());assert.equal(s.c.getState().mouse,false);
+ s.input({type:'button',button:0,down:false});s.input({type:'move',dx:1,dy:0});s.advance(20);assert(s.c.getReaction());
+ s.input({type:'key',code:'KeyA',down:true});assert.equal(s.c.getReaction(),null);assert(s.c.getState().keys.includes('KeyA'));
+ s.destroy();assert.equal(s.timers.size,0);
+});
+test('desktop drag, long press, right click and pointer cancellation never trigger a tap',async()=>{
+ const s=setup(),body=s.document.querySelector('#body-motion');let drags=0;s.window.clawdDesktop.drag=async()=>{drags++;};
+ pointer(s,body,'pointerdown');pointer(s,body,'pointermove',{clientX:110});pointer(s,body,'pointerup',{clientX:110});await flush();assert.equal(drags,1);assert.equal(s.c.getReaction(),null);
+ pointer(s,body,'pointerdown');s.advance(350);pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
+ pointer(s,body,'pointerdown',{button:2});pointer(s,body,'pointerup',{button:2});assert.equal(s.c.getReaction(),null);
+ pointer(s,body,'pointerdown');pointer(s,body,'pointercancel');pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
  s.destroy();assert.equal(s.timers.size,0);
 });

@@ -25,6 +25,8 @@ pub struct Preferences {
     pub mirrored: bool,
     /// Speech bubble for status lines (小蟹台词). Missing in old files → on.
     pub bubble_lines: bool,
+    /// Small, zoned reach; false keeps the original short-hand animation.
+    pub directional_arms: bool,
 }
 /// Logical main-window size (UI v2: transparent, no top/bottom bars). Keep in sync with web/desktop-renderer.js.
 pub const MAIN_WIDTH: f64 = 388.0;
@@ -49,6 +51,7 @@ impl Default for Preferences {
             side_buttons: true,
             mirrored: false,
             bubble_lines: true,
+            directional_arms: true,
         }
     }
 }
@@ -85,6 +88,7 @@ impl Preferences {
         boolean!("sideButtons", side_buttons);
         boolean!("mirrored", mirrored);
         boolean!("bubbleLines", bubble_lines);
+        boolean!("directionalArms", directional_arms);
         if let Some(n) = patch.get("scale").and_then(Value::as_f64) {
             if n.is_finite() {
                 self.scale = n;
@@ -188,6 +192,15 @@ mod tests {
         let v = serde_json::to_value(&p).unwrap();
         assert_eq!(v["sideButtons"], false);
         assert_eq!(v["bubbleLines"], false);
+    }
+    #[test]
+    fn directional_arms_migrate_on_and_can_keep_original_motion() {
+        let mut p: Preferences = serde_json::from_str(r#"{"scale":1}"#).unwrap();
+        assert!(p.directional_arms);
+        p.patch(&serde_json::json!({"directionalArms":false}));
+        p.patch(&serde_json::json!({"directionalArms":"true"}));
+        assert!(!p.directional_arms);
+        assert_eq!(serde_json::to_value(&p).unwrap()["directionalArms"], false);
     }
     #[test]
     fn preferences_round_trip() {

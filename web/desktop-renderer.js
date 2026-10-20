@@ -2,7 +2,7 @@
   'use strict';
   const root=document.getElementById('clawd-desktop');
   const rig=JSON.parse(document.getElementById('clawd-rig-data').textContent);
-  const controller=window.createClawdController(root,rig,{bindInput:false,bindDemo:false,sunglassesEnabled:true,happyEnabled:true,accessoryStorage:false,breathingEnabled:true,onAccessoryConfirmed:line=>speak(line,'accessory')});
+  const controller=window.createClawdController(root,rig,{bindInput:false,bindDemo:false,sunglassesEnabled:true,happyEnabled:true,accessoryStorage:false,breathingEnabled:true,reachEnabled:true,onAccessoryConfirmed:line=>speak(line,'accessory')});
   const bridge=window.clawdDesktop;
   const connection=root.querySelector('[data-connection]'),toggle=root.querySelector('[data-toggle]');
   const panel=root.querySelector('[data-accessory-menu]'),error=root.querySelector('[data-accessory-error]');
@@ -121,7 +121,8 @@
       if(value.code==='Pause'){if(value.down)controller.tap('Pause');return;}
       if(value.down){if(controller.press(value.code,{repeat:held.has(value.code)}))held.add(value.code);}
       else{held.delete(value.code);controller.release(value.code);}
-    }else if(value.type==='move')moveLater(value.dx,value.dy);
+    }else if(ownsPointer())return;
+    else if(value.type==='move')moveLater(value.dx,value.dy);
     else if(value.type==='button'){
       if(value.down)controller.moveMouse(0,0);
       controller.mouseButton(value.button,value.down);
@@ -148,8 +149,44 @@
     if(sleepConfig!==lastSleepConfig){controller.configure({sleepEnabled:value.sleepEnabled!==false,sleepSeconds:value.sleepSeconds||90,breathingEnabled:value.breathingEnabled!==false});lastSleepConfig=sleepConfig;}
     if(!adjusting()&&controller.getState().accessory.selected!==value.accessory)controller.restoreAccessory(value.accessory||'none');
     if(value.running&&!connected&&!paused&&!adjusting())controller.resumeIdle();
+    const reach=value.directionalArms!==false;
+    if(controller.getReachEnabled()!==reach){controller.cancelReaction();controller.setReachEnabled(reach);}
     connected=value.running;layout();syncStatistics();
   }
+  // The native raw-input stream also sees clicks on our own window. Give
+  // body hover / gestures ownership before forwarding mouse animation events.
+  let bodyHovered=false,gesture=null,nativeDragging=false;
+  const isBody=node=>!!node?.closest?.('#body-motion,#left-hand,#right-hand');
+  function ownsPointer(){return bodyHovered||gesture!==null||nativeDragging;}
+  function dropMouse(){pendingMouse=null;cancelAnimationFrame(mouseFrame);mouseFrame=null;if(controller.getState().mouse){controller.mouseButton(0,false);controller.mouseButton(2,false);controller.stopMouse();}}
+  root.addEventListener('pointerover',e=>{bodyHovered=isBody(e.target);if(bodyHovered)dropMouse();});
+  root.addEventListener('pointerleave',()=>{bodyHovered=false;});
+  root.addEventListener('pointerdown',e=>{
+    if(e.button!==0||e.target.closest('button,input,textarea,select,a,[data-accessory-menu]')||!e.target.closest('.scene,.statistics'))return;
+    gesture={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now(),body:isBody(e.target)};
+    bodyHovered=gesture.body;dropMouse();root.setPointerCapture?.(e.pointerId);e.preventDefault();
+  });
+  root.addEventListener('pointermove',e=>{
+    if(!gesture){bodyHovered=isBody(e.target);if(bodyHovered)dropMouse();return;}
+    if(e.pointerId!==gesture.id||Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<=6)return;
+    const id=gesture.id;gesture=null;nativeDragging=true;controller.cancelReaction();dropMouse();
+    if(root.hasPointerCapture?.(id))root.releasePointerCapture(id);
+    Promise.resolve(bridge.drag?.()).catch(()=>{}).finally(()=>{nativeDragging=false;});
+  });
+  function releaseGesture(e,cancelled=false){
+    if(!gesture||e.pointerId!==gesture.id)return;
+    const g=gesture;gesture=null;
+    if(root.hasPointerCapture?.(e.pointerId))root.releasePointerCapture(e.pointerId);
+    if(!cancelled&&g.body&&Math.hypot(e.clientX-g.x,e.clientY-g.y)<=6&&performance.now()-g.at<=300
+      &&runtime.enabled!==false&&!runtime.settingsOpen&&!runtime.popupOpen&&!adjusting()){
+      forgetInput();hideBubble();stopThoughtWatch();controller.react('random');
+    }
+  }
+  window.addEventListener('pointerup',e=>releaseGesture(e));
+  root.addEventListener('pointercancel',e=>releaseGesture(e,true));
+  root.addEventListener('lostpointercapture',e=>{if(gesture?.id===e.pointerId)gesture=null;});
+  root.addEventListener('contextmenu',()=>{gesture=null;controller.cancelReaction();dropMouse();});
+  window.addEventListener('blur',()=>{gesture=null;bodyHovered=false;});
   async function openAccessories(){
     if(disposed||controller.getState().accessory.menuOpen||runtime.settingsOpen)return;
     const generation=++accessoryGeneration;

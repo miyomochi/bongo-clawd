@@ -1,0 +1,49 @@
+name: Windows packages
+on:
+  push:
+    branches: ['release/stable-*', 'release/beta-*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Frontend checks
+        shell: pwsh
+        run: |
+          python scripts/build-frontend.py
+          python scripts/build-reach-preview.py
+          python scripts/build-click-preview.py
+          node --test tests/*.test.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Frontend checks failed' }
+          python scripts/verify-assets.py
+          if ($LASTEXITCODE -ne 0) { throw 'Asset checks failed' }
+      - name: Rust core checks
+        shell: pwsh
+        run: |
+          rustup show
+          cargo test --manifest-path core-tests/Cargo.toml --locked
+          if ($LASTEXITCODE -ne 0) { throw 'Core checks failed' }
+      - name: Build portable package
+        shell: pwsh
+        run: ./scripts/build-windows.ps1
+      - name: Build installer and checksums
+        shell: pwsh
+        run: |
+          choco install nsis --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'NSIS installation failed' }
+          $version = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          ./scripts/build-installer.ps1 -PackageDirectory "dist/Bongo-Clawd-$version-Windows-x64" -Version $version -MakeNSIS "${env:ProgramFiles(x86)}/NSIS/makensis.exe"
+          Compress-Archive -Path "dist/Bongo-Clawd-$version-Windows-x64-Setup.exe" -DestinationPath "dist/Bongo-Clawd-$version-Windows-x64-Setup.zip" -Force
+          Get-ChildItem dist/*.zip | ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bongo-Clawd-Windows-${{ github.sha }}
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30

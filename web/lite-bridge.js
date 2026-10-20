@@ -31,10 +31,6 @@
   document.addEventListener('DOMContentLoaded',()=>{
     if(!document.getElementById('clawd-desktop'))return;
     invoke('clawd_ready').catch(()=>{});
-    document.addEventListener('mousedown',event=>{
-      if(event.button!==0||event.target.closest('button,input,textarea,select,a,[data-accessory-menu]'))return;
-      if(event.target.closest('.scene,.statistics'))tauri.window.getCurrentWindow().startDragging().catch(()=>{});
-    });
     document.addEventListener('contextmenu',event=>{event.preventDefault();if(!event.target.closest('[data-accessory-menu]'))invoke('clawd_menu').catch(()=>{});});
   });
 })();

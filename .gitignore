@@ -17,3 +17,5 @@ Thumbs.db
 !/downloads/
 !/downloads/Bongo-Clawd-Lite-Windows-x64.zip
 !/downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip
+
+/node_modules
