@@ -6,7 +6,7 @@
 
 Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击键盘都有动作映射(尚未做到对多种型号键盘不同键位的适配orz)。忙起来会加速敲击，空闲时会左右张望、伸懒腰，再偷偷睡个小觉，目前有两种彩蛋动画。还可以换上耳机、猫耳、发芽或者头顶小黄鸭~未来会考虑加入更多装饰，给小蟹布置自己的小工位。
 
-稳定版候选：**0.3.0**，支持 **Windows 10 / 11 x64**。
+当前稳定版：**0.3.0**，支持 **Windows 10 / 11 x64**。
 
 ## 先试试看
 
@@ -18,11 +18,11 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 **Windows 安全提示**：目前这是个人同好项目，暂未购买代码签名证书(对我来说有点昂贵了TT)。安装包及便携版中的 EXE 均未进行数字签名，Windows 可能显示“未知发布者”“Windows 已保护你的电脑”，或按设备策略阻止运行，想使用允许一下就行。只是请确认文件来自本仓库而不是奇奇怪怪的同名，并按需核对 [SHA-256 校验值](downloads/SHA256SUMS.txt)，再自行决定是否运行。便携版同样可能出现这些提示。
 
-1. 下载 [Windows x64 安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64-Setup.zip)。
-2. 解压后运行 `Bongo-Clawd-0.2.1-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
+1. 下载 [Windows x64 安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip)。
+2. 解压后运行 `Bongo-Clawd-0.3.0-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
 3. 如果正在使用旧版，先从托盘菜单完全退出旧版。更换安装盘符时先卸载旧安装，再安装到新目录；个人设置会保留。
 
-不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。这个更透明一点。
+不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。这个更透明一点。
 
 ！运行该程序需要系统已安装 Microsoft Edge WebView2 Runtime。若提示缺少运行时，可从 [微软官方页面](https://developer.microsoft.com/microsoft-edge/webview2/) 安装 Evergreen Runtime。
 
@@ -31,12 +31,15 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 旧版可从 [v0.1.0 运行包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-Lite-Windows-x64.zip) 下载，旧版程序名为 `Bongo-Clawd-Lite.exe`。
 
 ## 版本说明及更新日志
+0.3.0-正式采用戳一戳互动；外观中可开关手臂方向感。大幅伸手像面筋，观感怪；新版稍微改善打字感，但不多，喜欢更小短手的也可沿用原来。
 0.2.1-增加安装目录选择、镜像工位、开机自启动、检查更新和卸载入口；每次重新启动回到主屏右下角，双击桌面图标唤出设置。
 0.2.0-增加了两种待机动画，增加头部装扮系统，优化了菜单等ui，调整了部分细节以更好适配，增加统计面板。
 0.1.0-第一个可运行版本，包含桌宠的基本功能，敲字，使用鼠标，简单的菜单功能，快敲及睡眠动画。
 
 ## 小蟹会做什么
 
+- **戳一戳**：轻点小蟹身体，它会歪头挠挠、害羞冒爱心、果冻弹弹或眯眼摇摇唱歌；右击和拖拽单独处理。
+- **手臂方向感**：按键按远近、内外分区，轻微伸手；在设置 → 外观关闭后沿用原来的小短手。
 - **镜像工位**：小蟹、键鼠与操作按钮一起换边；统计条保留翻转后的透视，数字和台词保持正常阅读方向。
 - **系统设置**：可开关 Windows 登录自启动、手动检查更新、打开卸载向导。
 - **键鼠联动**：按键会点亮对应键位，小蟹跟着抬手、敲击；支持双手打字以及键鼠同时使用。
@@ -108,4 +111,4 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 - **稳定版 0.3.0**：可选的小幅手臂方向感，以及正式采用的戳一戳互动。保留手动检查更新。
 - **beta 0.3.1-beta.1**：包含稳定版功能，额外试验每天自动检查、下载校验、安装与动画。不稳定，愿意尝鲜再选。
-- 下方旧版下载仍是已发布的 0.2.1；新包完成 Windows 构建后再替换，避免指向不存在的安装包。
+- 稳定版只读取正式更新；beta 尚待授权发布，稳定版不会主动切换到 beta。

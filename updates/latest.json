@@ -1,5 +1,6 @@
 {
-  "version": "0.2.1",
-  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64-Setup.zip",
-  "sha256": "46e4b103f26f86d28f956f7f688ace1d916275402ab9a8b1214830da96998c68"
+  "version": "0.3.0",
+  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
+  "sha256": "e26c765e83d5a188aa84899a7d17154f13346926e95c4d0263bb64174cf5c423",
+  "notes": "正式加入四种戳一戳：歪头挠挠、害羞爱心、果冻弹弹、眯眼摇摇唱歌。外观新增手臂方向感开关，按远近和内外轻微伸手；幅度太大像面筋，观感怪，新版稍微改善打字感，但不多，喜欢更小短手的也可关闭沿用原来。轻点、右击和拖拽分别处理。自动检查和应用内下载/安装仅在 beta 试验，稳定版仍可手动检查更新。"
 }

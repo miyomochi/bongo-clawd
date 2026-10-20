@@ -3,3 +3,5 @@
 b1d2a0d38550bf9425034ceb249a9ed7f2e6abdacfb3e90c460ea342d31a7963  Bongo-Clawd-0.2.1-Windows-x64.zip
 65e3eb13b6c9a739ebf5be9a73bace34ff525d39ebcf16eb1767ad8290eb0d51  Bongo-Clawd-Lite-Windows-x64.zip
 965cb3fd94de68c8634c676913e1eb96ec849ce5266f4ac0633494ba9bc0d2b6  Bongo-Clawd-animation-trial.zip
+e26c765e83d5a188aa84899a7d17154f13346926e95c4d0263bb64174cf5c423  Bongo-Clawd-0.3.0-Windows-x64-Setup.zip
+c94941a590b1d2f3734a9af1a96467ab1cf414144044fa9b30a84c4bdbc7b6c3  Bongo-Clawd-0.3.0-Windows-x64.zip
