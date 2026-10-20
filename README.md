@@ -16,13 +16,13 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 ## 下载与使用
 
-**Windows 安全提示**：目前这是个人同好项目，暂未购买代码签名证书。安装包及便携版中的 EXE 均未进行数字签名，Windows 可能显示“未知发布者”“Windows 已保护你的电脑”，或按设备策略阻止运行。请确认文件来自本仓库，并按需核对 [SHA-256 校验值](downloads/SHA256SUMS.txt)，再自行决定是否运行。便携版同样可能出现这些提示。
+**Windows 安全提示**：目前这是个人同好项目，暂未购买代码签名证书(对我来说有点昂贵了TT)。安装包及便携版中的 EXE 均未进行数字签名，Windows 可能显示“未知发布者”“Windows 已保护你的电脑”，或按设备策略阻止运行，想使用允许一下就行。只是请确认文件来自本仓库而不是奇奇怪怪的同名，并按需核对 [SHA-256 校验值](downloads/SHA256SUMS.txt)，再自行决定是否运行。便携版同样可能出现这些提示。
 
 1. 下载 [Windows x64 安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64-Setup.zip)。
 2. 解压后运行 `Bongo-Clawd-0.2.1-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
 3. 如果正在使用旧版，先从托盘菜单完全退出旧版。更换安装盘符时先卸载旧安装，再安装到新目录；个人设置会保留。
 
-不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。
+不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。这个更透明一点。
 
 ！运行该程序需要系统已安装 Microsoft Edge WebView2 Runtime。若提示缺少运行时，可从 [微软官方页面](https://developer.microsoft.com/microsoft-edge/webview2/) 安装 Evergreen Runtime。
 
@@ -100,6 +100,6 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 ## 致谢与许可
 
-本项目为非官方同好作品，Clawd 角色及相关品牌属于各自权利人。小蟹这个萌！
+本项目为非官方同好作品，Clawd 角色及相关品牌属于各自权利人。小蟹这个萌！你是谁?请支持我们Clawd。)
 
 原创代码许可见 [LICENSE-CODE.txt](LICENSE-CODE.txt)，第三方说明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
