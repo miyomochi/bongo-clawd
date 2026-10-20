@@ -30,10 +30,11 @@ pub struct Adjustments {
     pub settings: bool,
     pub accessory: bool,
     pub popup: bool,
+    pub update: bool,
 }
 impl Adjustments {
     pub fn any(&self) -> bool {
-        self.settings || self.accessory || self.popup
+        self.settings || self.accessory || self.popup || self.update
     }
 }
 pub struct AppState {
@@ -52,6 +53,7 @@ pub struct AppState {
     pub input_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
     pub side_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
     pub mirror_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
+    pub updater: Mutex<crate::update_service::UpdateRuntime>,
 }
 pub enum SaveMessage {
     Update(Preferences),
@@ -104,7 +106,8 @@ pub fn snapshot(app: &tauri::AppHandle) -> Value {
     let a = s.adjustments.lock().unwrap();
     let mut value = serde_json::to_value(p).unwrap();
     let map = value.as_object_mut().unwrap();
-    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Windows 桌面版","autostartEnabled":system::autostart_enabled(),"installed":system::installed(),"version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
+    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Beta · 更新功能不稳定","autostartEnabled":system::autostart_enabled(),"installed":system::installed(),"version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
+    value.as_object_mut().unwrap().insert("update".into(), serde_json::to_value(crate::update_service::view(app)).unwrap());
     value
 }
 pub fn publish(app: &tauri::AppHandle) {
@@ -168,7 +171,7 @@ fn configure_main(app: &tauri::AppHandle, p: &Preferences) -> Result<(), String>
         .map_err(|e| e.to_string())?;
     Ok(())
 }
-fn set_adjustment(app: &tauri::AppHandle, kind: &str, open: bool) -> Result<(), String> {
+pub(crate) fn set_adjustment(app: &tauri::AppHandle, kind: &str, open: bool) -> Result<(), String> {
     let s = app.state::<AppState>();
     let adjusting = {
         let mut a = s.adjustments.lock().unwrap();
@@ -176,6 +179,7 @@ fn set_adjustment(app: &tauri::AppHandle, kind: &str, open: bool) -> Result<(), 
             "settings" => a.settings = open,
             "accessory" => a.accessory = open,
             "popup" => a.popup = open,
+            "update" => a.update = open,
             _ => return Err("Unknown adjustment".into()),
         }
         a.any()
@@ -306,7 +310,7 @@ fn spawn_settings(app: &tauri::AppHandle) {
         let _ = open_settings(&a);
     });
 }
-fn local_navigation(url: &tauri::Url) -> bool {
+pub(crate) fn local_navigation(url: &tauri::Url) -> bool {
     url.scheme() == "tauri" || url.host_str() == Some("tauri.localhost")
 }
 type MenuParts = (
@@ -446,10 +450,29 @@ fn clawd_autostart(window: WebviewWindow, enabled: bool) -> Result<(), String> {
 }
 #[tauri::command]
 async fn clawd_check_updates(window: WebviewWindow) -> Result<(), String> {
-    authorize(&window, false)?;
-    if window.label() != "settings" { return Err("Settings window required".into()); }
+    authorize_updates(&window)?;
+    if !matches!(window.label(), "settings" | "updates") { return Err("Settings or update window required".into()); }
     let app = window.app_handle().clone();
-    tauri::async_runtime::spawn_blocking(move || system::check_updates(&app)).await.map_err(|e| e.to_string())?
+    tauri::async_runtime::spawn_blocking(move || crate::update_service::check(&app, true)).await.map_err(|e| e.to_string())?
+}
+fn authorize_updates(window: &WebviewWindow) -> Result<(), String> {
+    if !matches!(window.label(), "main" | "settings" | "updates") || !local_navigation(&window.url().map_err(|e|e.to_string())?) {return Err("Unexpected update window".into());}
+    Ok(())
+}
+#[tauri::command]
+fn clawd_update_snapshot(window: WebviewWindow) -> Result<crate::update_service::View,String> {
+    authorize_updates(&window)?;Ok(crate::update_service::view(window.app_handle()))
+}
+#[tauri::command]
+fn clawd_update_dismiss(window: WebviewWindow, snooze: bool) -> Result<(),String> {
+    authorize_updates(&window)?;crate::update_service::dismiss(window.app_handle(),snooze)
+}
+#[tauri::command]
+async fn clawd_install_update(window: WebviewWindow) -> Result<(),String> {
+    authorize_updates(&window)?;
+    if window.label()!="updates" {return Err("Update window required".into());}
+    let app=window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || crate::update_service::install(&app)).await.map_err(|e|e.to_string())?
 }
 #[tauri::command]
 async fn clawd_uninstall(window: WebviewWindow) -> Result<(), String> {
@@ -499,12 +522,13 @@ fn clawd_ready(window: WebviewWindow) -> Result<(), String> {
     let s = window.state::<AppState>();
     if !s.ready.swap(true, Ordering::SeqCst) {
         window.show().map_err(|e| e.to_string())?;
-        if (s.prefs.lock().unwrap().show_on_startup
-            && !std::env::args().any(|arg| arg == "--autostart"))
-            || std::env::args().any(|arg| arg == "--open-settings")
-        {
-            spawn_settings(window.app_handle());
-        }
+        let app=window.app_handle().clone();
+        std::thread::spawn(move || {
+            crate::update_service::startup(&app);
+            let s=app.state::<AppState>();
+            if crate::update_service::view(&app).phase=="idle" && !std::env::args().any(|a|a=="--updated"||a=="--update-failed") &&
+               ((s.prefs.lock().unwrap().show_on_startup&&!std::env::args().any(|a|a=="--autostart"))||std::env::args().any(|a|a=="--open-settings")) {spawn_settings(&app);}
+        });
     }
     Ok(())
 }
@@ -529,6 +553,9 @@ pub fn run() {
             clawd_ready,
             clawd_autostart,
             clawd_check_updates,
+            clawd_update_snapshot,
+            clawd_update_dismiss,
+            clawd_install_update,
             clawd_uninstall
         ])
         .on_menu_event(|app, event| menu_action(app, event.id().as_ref()))
@@ -537,6 +564,12 @@ pub fn run() {
             let Some(s) = app.try_state::<AppState>() else {
                 return;
             };
+            if window.label()=="updates" {
+                if let WindowEvent::CloseRequested {api,..}=event {
+                    if s.updater.lock().unwrap().busy {api.prevent_close();}
+                }
+                if matches!(event, WindowEvent::Destroyed) {crate::update_service::window_closed(app);}
+            }
             if window.label() == "settings" && matches!(event, WindowEvent::Destroyed) {
                 let _ = set_adjustment(app, "settings", false);
             }
@@ -577,7 +610,7 @@ pub fn run() {
                 statistics: Mutex::new(crate::statistics::Statistics::new(
                     prefs.statistics_enabled,
                 )),
-                adjustments: Mutex::new(Adjustments::default()),
+                adjustments: Mutex::new(Adjustments {update:true,..Adjustments::default()}),
                 runtime: Mutex::new(Runtime {
                     enabled: true,
                     running: false,
@@ -595,6 +628,7 @@ pub fn run() {
                 input_item: Mutex::new(None),
                 side_item: Mutex::new(None),
                 mirror_item: Mutex::new(None),
+                updater: Mutex::new(crate::update_service::UpdateRuntime::load(path.with_file_name("updates-state.json"))),
             });
             let (width, height) = prefs.dimensions();
             let main = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))

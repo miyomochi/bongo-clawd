@@ -2,8 +2,8 @@
   'use strict';
   const bridge=window.clawdDesktop;
   // Same backend keys as before; sideButtons / bubbleLines are new and default to on when missing.
-  const ids=['alwaysOnTop','showOnStartup','breathingEnabled','statisticsEnabled','sideButtons','bubbleLines','mirrored','directionalArms'];
-  const defaultOff=new Set(['statisticsEnabled','mirrored']);
+  const ids=['alwaysOnTop','showOnStartup','breathingEnabled','statisticsEnabled','sideButtons','bubbleLines','mirrored','directionalArms','autoCheckUpdates'];
+  const defaultOff=new Set(['statisticsEnabled','mirrored','autoCheckUpdates']);
   const $=id=>document.getElementById(id);
   const scale=$('scale'),output=$('scale-output'),seconds=$('sleepSeconds'),status=$('save-status'),custom=$('custom-sleep');
   const presets=[60,90,300,900];

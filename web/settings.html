@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · 设置</title><link rel="stylesheet" href="settings.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · Beta 设置</title><link rel="stylesheet" href="settings.css"></head>
 <body>
 <main class="card">
-<header class="head"><h1>设置</h1><button id="help-toggle" class="icon" type="button" data-help aria-expanded="false" aria-controls="help" title="说明">?</button></header>
+<header class="head"><h1>设置 · Beta</h1><button id="help-toggle" class="icon" type="button" data-help aria-expanded="false" aria-controls="help" title="说明">?</button></header>
 <nav class="tabs" role="tablist" aria-label="设置分类">
 <button type="button" role="tab" id="tab-appearance" data-tab="appearance" aria-selected="true" aria-controls="panel-appearance">外观</button>
 <button type="button" role="tab" id="tab-rest" data-tab="rest" aria-selected="false" aria-controls="panel-rest" tabindex="-1">休息</button>
@@ -36,6 +36,8 @@
 </section>
 <section class="panel" id="panel-system" data-panel="system" role="tabpanel" aria-labelledby="tab-system" hidden>
 <label class="row switch"><span>开机自启动<small>登录 Windows 后自动显示小蟹</small></span><input id="autostartEnabled" type="checkbox"><i aria-hidden="true"></i></label>
+<p class="note">Beta 更新试验不稳定，愿意尝鲜再开启；安装前会再次询问。</p>
+<label class="row switch"><span>每天自动检查更新 · Beta<small>每天首次启动检查，默认关闭，可手动检查</small></span><input id="autoCheckUpdates" type="checkbox"><i aria-hidden="true"></i></label>
 <div class="system-actions"><button type="button" id="check-updates">检查更新</button><button type="button" id="uninstall">卸载 Bongo Clawd</button></div>
 <p class="note" id="install-note"></p>
 <p class="note" id="system-status" role="status" aria-live="polite"></p>

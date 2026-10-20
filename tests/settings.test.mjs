@@ -38,3 +38,8 @@ test('appearance can persist the original short-hand mode and restore directiona
  s.notify({directionalArms:false});assert.equal(s.document.getElementById('directionalArms').checked,false);
  s.change('directionalArms',true);await flush();assert.equal(s.calls[1][1].directionalArms,true);
 });
+
+test('beta automatic checks are opt-in and persisted separately from arm settings',async()=>{
+ const s=setup();await flush();assert.equal(s.document.getElementById('autoCheckUpdates').checked,false);
+ s.change('autoCheckUpdates',true);await flush();assert.equal(s.calls[0][1].autoCheckUpdates,true);
+});

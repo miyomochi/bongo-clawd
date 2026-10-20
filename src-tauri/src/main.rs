@@ -7,6 +7,7 @@ mod resources;
 mod statistics;
 mod system;
 mod updates;
+mod update_service;
 fn main() {
     app::run();
 }

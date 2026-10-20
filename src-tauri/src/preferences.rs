@@ -27,6 +27,7 @@ pub struct Preferences {
     pub bubble_lines: bool,
     /// Small, zoned reach; false keeps the original short-hand animation.
     pub directional_arms: bool,
+    pub auto_check_updates: bool,
 }
 /// Logical main-window size (UI v2: transparent, no top/bottom bars). Keep in sync with web/desktop-renderer.js.
 pub const MAIN_WIDTH: f64 = 388.0;
@@ -52,6 +53,7 @@ impl Default for Preferences {
             mirrored: false,
             bubble_lines: true,
             directional_arms: true,
+            auto_check_updates: false,
         }
     }
 }
@@ -89,6 +91,7 @@ impl Preferences {
         boolean!("mirrored", mirrored);
         boolean!("bubbleLines", bubble_lines);
         boolean!("directionalArms", directional_arms);
+        boolean!("autoCheckUpdates", auto_check_updates);
         if let Some(n) = patch.get("scale").and_then(Value::as_f64) {
             if n.is_finite() {
                 self.scale = n;

@@ -1,18 +1,13 @@
 {
   "date": "2026-10-20",
-  "version": "0.3.0",
-  "channel": "stable",
+  "version": "0.3.1-beta.1",
+  "channel": "beta",
   "checks": {
-    "node_animation_and_desktop": 94,
-    "rust_core": 19,
-    "candidate_assets": 29,
-    "icon_assets": 3,
-    "windows_x64_build": "passed Windows MSVC release",
-    "installer": "NSIS compiled with explicit UTF-8; ZIP hash, CRC, and expected single entry verified",
-    "portable": "ZIP hash and CRC verified; EXE Windows x64 PE verified",
-    "windows_runtime": "not_run_for_0.3.0"
+    "frontend": "passed locally; animation, desktop, settings, gesture event routes",
+    "rust_core": "pending Windows build",
+    "windows_runtime": "not_run_for_this_version",
+    "installer": "pending Windows build",
+    "updater": "simulation passed; Windows update service and installer pending"
   },
-  "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39443645265",
-  "source_commit": "229d9b36650f1cf793c95e66a36281a214ff2693",
   "note": "0.2.1 runtime approval does not apply to 0.3.0."
 }

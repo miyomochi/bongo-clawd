@@ -72,7 +72,7 @@
     node.style.setProperty('--tail',Math.round(Math.max(6,Math.min(w-18,HEAD.x-left-5)))+'px');
   }
   function hideBubble(){clearTimeout(bubbleTimer);clearTimeout(bubbleFade);bubbleTimer=bubbleFade=null;bubbleSource=null;bubble.hidden=true;bubble.classList.remove('is-fading');}
-  function speechBlocked(){return disposed||runtime.bubbleLines===false||runtime.enabled===false||runtime.phase==='error'||document.hidden||controller.getState().paused||adjusting();}
+  function speechBlocked(){return (runtime.update?.phase&&runtime.update.phase!=='idle')||disposed||runtime.bubbleLines===false||runtime.enabled===false||runtime.phase==='error'||document.hidden||controller.getState().paused||adjusting();}
   function stopThoughtWatch(){clearTimeout(thoughtTimer);thoughtTimer=null;}
   function speak(text,source='status'){
     if(speechBlocked()){hideBubble();return;}
@@ -115,8 +115,8 @@
   }
   function input(value){
     if(disposed||!value)return;
-    if(value.type==='reset'){forgetInput();if(!adjusting()){controller.clearAll();if(runtime.running&&!controller.getState().paused)controller.resumeIdle();}return;}
-    if(controller.getState().paused||adjusting()||!runtime.enabled||runtime.settingsOpen||runtime.popupOpen)return;
+    if(value.type==='reset'){forgetInput();if(runtime.update?.phase&&runtime.update.phase!=='idle')return;if(!adjusting()){controller.clearAll();if(runtime.running&&!controller.getState().paused)controller.resumeIdle();}return;}
+    if((runtime.update?.phase&&runtime.update.phase!=='idle')||controller.getState().paused||adjusting()||!runtime.enabled||runtime.settingsOpen||runtime.popupOpen)return;
     if(value.type==='key'){
       if(value.code==='Pause'){if(value.down)controller.tap('Pause');return;}
       if(value.down){if(controller.press(value.code,{repeat:held.has(value.code)}))held.add(value.code);}
@@ -132,19 +132,22 @@
     if(disposed||!value)return;runtime={...runtime,...value};value=runtime;
     const label={starting:'连接中',listening:'联动中',paused:'已暂停',locked:'锁屏暂停',error:'连不上了 · 点我重试',unsupported:'系统不支持联动'};
     connection.textContent=value.settingsOpen||value.popupOpen||controller.getState().accessory.menuOpen?'调整中':label[value.phase]||'连接中';connection.title=value.detail||connection.textContent;
+    const updateActive=!!value.update?.phase&&value.update.phase!=='idle';
     const manual=value.enabled===false;
-    root.classList.toggle('is-paused',manual);
+    root.classList.toggle('is-paused',manual&&!updateActive);
     toggle.classList.toggle('is-card',manual);
     toggle.setAttribute('aria-pressed',String(!manual));
     toggle.setAttribute('aria-label',manual?'已暂停 · 点一下继续':'暂停');toggle.title=manual?'点一下继续 · 按住拖动':'暂停';
     // Connection errors use the orange bubble; a healthy connection shows no status at all.
-    retry.hidden=value.phase!=='error'||manual;retry.title=value.detail||'重试输入服务';
+    retry.hidden=value.phase!=='error'||manual||updateActive;retry.title=value.detail||'重试输入服务';
     if(!retry.hidden){hideBubble();placeBubble(retry);}
     if(manual||value.bubbleLines===false)hideBubble();
-    const paused=!value.enabled||value.settingsOpen||value.popupOpen||document.hidden||['starting','locked','error','unsupported'].includes(value.phase);
-    if(paused)forgetInput();controller.setPaused(!!paused);
+    root.classList.toggle('is-updating',updateActive);
+    const paused=!updateActive&&(!value.enabled||value.settingsOpen||value.popupOpen||document.hidden||['starting','locked','error','unsupported'].includes(value.phase));
+    if(updateActive)controller.cancelReaction();
+    if(paused||updateActive)forgetInput();controller.setPaused(!!paused);controller.setUpdateState?.(value.update||{phase:'idle'});
     if(paused||value.bubbleLines===false){hideBubble();stopThoughtWatch();}
-    root.querySelector('.side').inert=manual;
+    root.querySelector('.side').inert=manual||updateActive;toggle.disabled=updateActive;
     const sleepConfig=JSON.stringify([value.sleepEnabled!==false,value.sleepSeconds||90,value.breathingEnabled!==false]);
     if(sleepConfig!==lastSleepConfig){controller.configure({sleepEnabled:value.sleepEnabled!==false,sleepSeconds:value.sleepSeconds||90,breathingEnabled:value.breathingEnabled!==false});lastSleepConfig=sleepConfig;}
     if(!adjusting()&&controller.getState().accessory.selected!==value.accessory)controller.restoreAccessory(value.accessory||'none');
@@ -178,7 +181,7 @@
     const g=gesture;gesture=null;
     if(root.hasPointerCapture?.(e.pointerId))root.releasePointerCapture(e.pointerId);
     if(!cancelled&&g.body&&Math.hypot(e.clientX-g.x,e.clientY-g.y)<=6&&performance.now()-g.at<=300
-      &&runtime.enabled!==false&&!runtime.settingsOpen&&!runtime.popupOpen&&!adjusting()){
+      &&!(runtime.update?.phase&&runtime.update.phase!=='idle')&&runtime.enabled!==false&&!runtime.settingsOpen&&!runtime.popupOpen&&!adjusting()){
       forgetInput();hideBubble();stopThoughtWatch();controller.react('random');
     }
   }
@@ -188,7 +191,7 @@
   root.addEventListener('contextmenu',()=>{gesture=null;controller.cancelReaction();dropMouse();});
   window.addEventListener('blur',()=>{gesture=null;bodyHovered=false;});
   async function openAccessories(){
-    if(disposed||controller.getState().accessory.menuOpen||runtime.settingsOpen)return;
+    if(disposed||controller.getState().accessory.menuOpen||runtime.settingsOpen||(runtime.update?.phase&&runtime.update.phase!=='idle'))return;
     const generation=++accessoryGeneration;
     forgetInput();hideBubble();stopThoughtWatch();panel.classList.add('is-opening');
     controller.setPaused(false);controller.openAccessoryMenu();layout();

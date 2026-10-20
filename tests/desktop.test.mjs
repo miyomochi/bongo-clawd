@@ -23,7 +23,7 @@ function setup(random=.2,preferences={}){
   };
   const context=vm.createContext({window,document,Math:math,performance:{now:()=>now},setTimeout:set,clearTimeout:clear,requestAnimationFrame:fn=>set(()=>fn(now),16),cancelAnimationFrame:clear});
   vm.runInContext(fs.readFileSync(new URL('../web/core/clawd.bundle.js',import.meta.url),'utf8'),context);
-  for(const file of ['clawd-reach','clawd-reactions'])vm.runInContext(fs.readFileSync(new URL('../web/core/'+file+'.js',import.meta.url),'utf8'),context);
+  for(const file of ['clawd-reach','clawd-reactions','clawd-update-visuals'])vm.runInContext(fs.readFileSync(new URL('../web/core/'+file+'.js',import.meta.url),'utf8'),context);
   vm.runInContext(fs.readFileSync(new URL('../web/desktop-renderer.js',import.meta.url),'utf8'),context);
   const advance=dt=>{const end=now+dt;let n=0;while(true){let first;for(const [i,t] of timers)if(t.at<=end&&(!first||t.at<first[1].at))first=[i,t];if(!first)break;now=first[1].at;timers.delete(first[0]);first[1].fn();assert(++n<100000);}now=end;};
   return {window,document,c:window.clawdDesktopController,timers,advance,saved,failSave:()=>{failSave=true;},openAccessories:()=>accessoryListener(),click:selector=>document.querySelector(selector).dispatchEvent(new window.Event('click',{bubbles:true})),input:v=>inputListener(v),state:v=>notify(v),destroy:()=>window.dispatchEvent(new window.Event('beforeunload'))};
@@ -294,6 +294,24 @@ test('desktop drag, long press, right click and pointer cancellation never trigg
  pointer(s,body,'pointerdown');s.advance(350);pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
  pointer(s,body,'pointerdown',{button:2});pointer(s,body,'pointerup',{button:2});assert.equal(s.c.getReaction(),null);
  pointer(s,body,'pointerdown');pointer(s,body,'pointercancel');pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
+ s.destroy();assert.equal(s.timers.size,0);
+});
+test('update ownership survives native reset events and blocks global input until dismissed',()=>{
+ const s=setup();s.state({update:{phase:'checking'},settingsOpen:true,phase:'paused',running:false});s.advance(500);
+ assert.equal(s.c.getState().paused,false);assert.equal(s.document.querySelector('#update-effects').getAttribute('display'),'inline');
+ s.input({type:'reset'});s.input({type:'move',dx:6,dy:6});s.input({type:'key',code:'KeyQ',down:true});s.advance(200);
+ assert.equal(s.c.getState().mouse,false);assert.equal(s.c.getState().keys.length,0);
+ s.advance(100000);assert.equal(s.c.getState().sleep,'awake');assert.equal(s.c.getState().looking,false);
+ s.state({update:{phase:'error',error:'offline'}});s.advance(400);assert.equal(s.document.querySelector('#update-dizzy').getAttribute('display'),'inline');
+ s.state({update:{phase:'idle'},settingsOpen:false,phase:'listening',running:true});s.input({type:'key',code:'KeyQ',down:true});s.advance(45);assert.equal(s.c.getState().left,'down');
+ assert.equal(s.document.querySelector('#update-dizzy').getAttribute('display'),'none');s.destroy();assert.equal(s.timers.size,0);
+});
+
+test('update visuals interrupt click reactions, reject body taps, and use large red ERROR',()=>{
+ const s=setup(),body=s.document.querySelector('#body-motion');
+ s.c.react('shy');assert(s.c.getReaction());s.state({update:{phase:'error'}});assert.equal(s.c.getReaction(),null);
+ pointer(s,body,'pointerdown');s.advance(60);pointer(s,body,'pointerup');assert.equal(s.c.getReaction(),null);
+ for(const text of s.document.querySelectorAll('[data-update-errors] text')){assert.equal(text.getAttribute('fill'),'#e33535');assert(Number(text.getAttribute('font-size'))>=8);}
  s.destroy();assert.equal(s.timers.size,0);
 });
 

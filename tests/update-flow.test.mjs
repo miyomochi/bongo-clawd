@@ -1,0 +1,23 @@
+import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';
+import {parseHTML} from './dom-test-worker.mjs';
+const page=fs.readFileSync(new URL('../dist/previews/Clawd-Update-Flow-Lab.html',import.meta.url),'utf8');
+const {window,document}=parseHTML(page);window.matchMedia=()=>({matches:false});
+let now=0,id=0;const timers=new Map(),storage=new Map();
+const set=(fn,ms=0)=>{timers.set(++id,{fn,at:now+ms});return id;};
+const context=vm.createContext({window,document,Math,performance:{now:()=>now},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},setTimeout:set,clearTimeout:i=>timers.delete(i),requestAnimationFrame:fn=>set(()=>fn(now),16),cancelAnimationFrame:i=>timers.delete(i)});
+for(const m of page.matchAll(/<script>([^]*?)<\/script>/g))vm.runInContext(m[1],context);
+function advance(dt){const end=now+dt;let n=0;while(true){let first;for(const e of timers)if(e[1].at<=end&&(!first||e[1].at<first[1].at))first=e;if(!first)break;now=first[1].at;timers.delete(first[0]);first[1].fn();assert(++n<100000);}now=end;}
+const flush=()=>new Promise(resolve=>setImmediate(resolve));const click=s=>document.querySelector(s).click();const phase=()=>window.clawdUpdatePreviewState.phase;
+await flush();assert.equal(phase(),'idle');
+click('[data-update-scenario="found"]');assert.equal(phase(),'checking');advance(1800);assert.equal(phase(),'available');assert(document.querySelector('[data-update-notes]').textContent.includes('预览'));
+click('[data-update-primary]');await flush();assert.equal(phase(),'downloading');advance(700);assert(window.clawdUpdatePreviewState.progress>0);assert.equal(document.querySelector('[data-update-close]').disabled,true);
+advance(4600);assert.equal(phase(),'success');assert.equal(document.querySelector('[data-update-wand]').getAttribute('display'),'inline');advance(4100);assert.equal(phase(),'idle');
+click('[data-update-scenario="check-error"]');advance(1800);assert.equal(phase(),'error');assert.equal(document.querySelector('#update-dizzy').getAttribute('display'),'inline');assert.equal(document.querySelector('[data-update-close]').disabled,false);click('[data-update-later]');await flush();assert.equal(phase(),'idle');assert.equal(document.querySelector('#update-dizzy').getAttribute('display'),'none');
+click('[data-update-scenario="download-error"]');advance(1800);click('[data-update-primary]');await flush();advance(1200);assert.equal(phase(),'error');assert(document.querySelector('[data-update-message]').textContent.includes('下载连接中断'));click('[data-update-close]');await flush();
+click('[data-update-scenario="current"]');advance(1800);assert.equal(phase(),'current');assert.equal(document.querySelector('[data-update-primary]').hidden,true);click('[data-update-close]');await flush();
+click('[data-new-day]');click('[data-simulate-start]');assert.equal(phase(),'checking');assert.equal(document.querySelector('.dialog-host').hidden,true);click('[data-simulate-start]');advance(1800);assert.equal(phase(),'available');
+document.querySelector('[data-update-snooze]').checked=true;click('[data-update-later]');await flush();click('[data-simulate-start]');assert.equal(phase(),'idle','automatic path checks at most once today');
+click('[data-update-scenario="found"]');advance(1800);assert.equal(phase(),'available','manual path ignores daily snooze');assert.equal(document.querySelector('[data-update-snooze]').checked,false);click('[data-update-close]');await flush();
+click('[data-new-day]');const auto=document.querySelector('[data-auto-check]');auto.checked=false;auto.dispatchEvent(new window.Event('change'));click('[data-simulate-start]');assert.equal(phase(),'idle');assert([...storage.values()][0].includes('"enabled":false'));
+window.dispatchEvent(new window.Event('pagehide'));advance(1000);assert.equal(timers.size,0);
+console.log('Update flow preview passed: found/download/verify/install/restart/success, two failure stages, recovery, latest version, daily gate, snooze, manual override, opt-out, progress and cleanup.');

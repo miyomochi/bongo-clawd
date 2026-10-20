@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][string]$PackageDirectory,
-    [string]$Version = '0.3.0',
+    [string]$Version = '0.3.1-beta.1',
     [string]$MakeNSIS = 'makensis.exe'
 )
 $ErrorActionPreference = 'Stop'

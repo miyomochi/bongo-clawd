@@ -19,6 +19,7 @@ jobs:
           python scripts/build-frontend.py
           python scripts/build-reach-preview.py
           python scripts/build-click-preview.py
+          if (Test-Path scripts/build-update-preview.py) { python scripts/build-update-preview.py }
           node --test tests/*.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Frontend checks failed' }
           python scripts/verify-assets.py
@@ -41,6 +42,10 @@ jobs:
           ./scripts/build-installer.ps1 -PackageDirectory "dist/Bongo-Clawd-$version-Windows-x64" -Version $version -MakeNSIS "${env:ProgramFiles(x86)}/NSIS/makensis.exe"
           Compress-Archive -Path "dist/Bongo-Clawd-$version-Windows-x64-Setup.exe" -DestinationPath "dist/Bongo-Clawd-$version-Windows-x64-Setup.zip" -Force
           Get-ChildItem dist/*.zip | ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+      - name: Verify update package extraction
+        if: startsWith(github.ref_name, 'release/beta-')
+        shell: pwsh
+        run: ./scripts/verify-update-package.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: Bongo-Clawd-Windows-${{ github.sha }}

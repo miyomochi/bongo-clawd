@@ -1,0 +1,6 @@
+{
+  "version": "0.2.1",
+  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.1-Windows-x64-Setup.zip",
+  "sha256": "46e4b103f26f86d28f956f7f688ace1d916275402ab9a8b1214830da96998c68",
+  "notes": "当前 beta 通道尚无更高版本。此条保留已发布的 0.2.1 元数据；beta 新包发布后再以真实哈希替换。"
+}

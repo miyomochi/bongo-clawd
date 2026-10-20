@@ -25,6 +25,10 @@
     usage:()=>invoke('clawd_usage'),
     autostart:enabled=>invoke('clawd_autostart',{enabled}),
     checkUpdates:()=>invoke('clawd_check_updates'),
+    updates:callback=>listen('clawd:update',callback),
+    updateSnapshot:()=>invoke('clawd_update_snapshot'),
+    dismissUpdate:snooze=>invoke('clawd_update_dismiss',{snooze:!!snooze}),
+    installUpdate:()=>invoke('clawd_install_update'),
     uninstall:()=>invoke('clawd_uninstall'),
     drag:()=>tauri.window.getCurrentWindow().startDragging()
   };

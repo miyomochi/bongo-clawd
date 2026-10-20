@@ -1,8 +1,10 @@
 Unicode true
 !include "MUI2.nsh"
 !include "x64.nsh"
+!include "FileFunc.nsh"
+Var UpdateMode
 !ifndef VERSION
-!define VERSION "0.3.0"
+!define VERSION "0.3.1-beta.1"
 !endif
 Name "Bongo Clawd"
 OutFile "${OUTPUT}"
@@ -14,14 +16,16 @@ Icon "${ICON}"
 UninstallIcon "${ICON}"
 !define MUI_ICON "${ICON}"
 !define MUI_UNICON "${ICON}"
+!define MUI_CUSTOMFUNCTION_ABORT UpdateAborted
 !define MUI_ABORTWARNING
-!define MUI_WELCOMEPAGE_TEXT "将为当前用户安装 Bongo Clawd，并创建开始菜单入口。$\r$\n$\r$\n安装前请先从托盘菜单退出正在运行的小蟹。$\r$\n$\r$\n需要系统已安装 Microsoft Edge WebView2 Runtime；本安装包不包含该运行时。"
+!define MUI_WELCOMEPAGE_TEXT "这是不稳定的 Beta 试验版。$\r$\n$\r$\n将为当前用户安装 Bongo Clawd，并创建开始菜单入口。$\r$\n$\r$\n安装前请先从托盘菜单退出正在运行的小蟹。$\r$\n$\r$\n需要系统已安装 Microsoft Edge WebView2 Runtime；本安装包不包含该运行时。"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_COMPONENTS
+!define MUI_PAGE_CUSTOMFUNCTION_PRE UpdateDirectoryPre
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !define MUI_FINISHPAGE_RUN "$INSTDIR\Bongo-Clawd.exe"
-!define MUI_FINISHPAGE_RUN_PARAMETERS "--open-settings"
+!define MUI_FINISHPAGE_RUN_FUNCTION RunClawd
 !define MUI_FINISHPAGE_RUN_TEXT "启动 Bongo Clawd"
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -29,7 +33,30 @@ UninstallIcon "${ICON}"
 !insertmacro MUI_UNPAGE_FINISH
 !insertmacro MUI_LANGUAGE "SimpChinese"
 !insertmacro MUI_LANGUAGE "English"
+Function UpdateDirectoryPre
+  StrCmp $UpdateMode "1" 0 +2
+    Abort
+FunctionEnd
+Function RunClawd
+  StrCmp $UpdateMode "1" 0 normal_launch
+    Exec '$\"$INSTDIR\Bongo-Clawd.exe$\" --updated'
+    Return
+  normal_launch:
+    Exec '$\"$INSTDIR\Bongo-Clawd.exe$\" --open-settings'
+FunctionEnd
+Function UpdateAborted
+  SetErrorLevel 1
+FunctionEnd
+Function .onInstFailed
+  SetErrorLevel 2
+FunctionEnd
 Function .onInit
+  StrCpy $UpdateMode "0"
+  ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/UPDATE" $R1
+  IfErrors +2 0
+    StrCpy $UpdateMode "1"
   ${IfNot} ${RunningX64}
     MessageBox MB_OK|MB_ICONSTOP "Bongo Clawd 需要 Windows 10 / 11 x64。"
     Abort
