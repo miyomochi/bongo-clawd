@@ -6,12 +6,16 @@ import vm from 'node:vm';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {parseHTML} from '../tests/dom-test-worker.mjs';
+import {DOMParser} from '../tests/dom-test-worker.mjs';
 const sharp=createRequire(import.meta.url)('sharp');
 const base=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const output=path.resolve(process.argv[2]||path.join(base,'dist/readme-frames'));
 fs.mkdirSync(output,{recursive:true});
-const {window,document}=parseHTML(fs.readFileSync(path.join(base,'web/index.html'),'utf8'));
+// XML mode preserves SVG case-sensitive tags and self-closing paths when poses change.
+const document=new DOMParser().parseFromString(
+  '<main id="clawd-desktop">'+fs.readFileSync(path.join(base,'web/clawd-scene.svg'),'utf8')+
+  '<span data-status=""></span><span data-last-key=""></span></main>','application/xml');
+const window=document.defaultView;
 window.matchMedia=()=>({matches:false});
 let now=0,sequence=0;
 const timers=new Map();
@@ -43,6 +47,12 @@ svg.setAttribute('width','432');svg.setAttribute('height','326');
 const style=document.createElement('style');style.textContent='.key.is-down .key-top,.is-clicked{fill:#f2bf72}';svg.prepend(style);
 for(let i=0;i<180;i++){
   advance(i*50);
+  // SVG geometry elements must remain siblings, never children of other paths.
+  for(const hand of ['left-hand','right-hand']){
+    const arm=svg.querySelector('#'+hand);
+    if(arm.querySelector('path path')||arm.querySelectorAll('path').length!==6)
+      throw new Error(`Invalid ${hand} geometry in frame ${i}`);
+  }
   await sharp(Buffer.from(svg.outerHTML)).flatten({background:'#f8f6f3'}).png()
     .toFile(path.join(output,`${String(i).padStart(4,'0')}.png`));
 }
