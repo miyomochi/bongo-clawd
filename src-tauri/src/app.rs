@@ -1,7 +1,7 @@
 use crate::{
     input::InputService,
     preferences::{Point, Preferences, DECORATIONS_HEIGHT},
-    resources,
+    resources, system,
 };
 use serde_json::{json, Value};
 use std::{
@@ -51,6 +51,7 @@ pub struct AppState {
     pub menu: Mutex<Option<Menu<tauri::Wry>>>,
     pub input_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
     pub side_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
+    pub mirror_item: Mutex<Option<CheckMenuItem<tauri::Wry>>>,
 }
 pub enum SaveMessage {
     Update(Preferences),
@@ -103,7 +104,7 @@ pub fn snapshot(app: &tauri::AppHandle) -> Value {
     let a = s.adjustments.lock().unwrap();
     let mut value = serde_json::to_value(p).unwrap();
     let map = value.as_object_mut().unwrap();
-    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Tauri · 动画整合候选版","version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
+    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Windows 桌面版","autostartEnabled":system::autostart_enabled(),"installed":system::installed(),"version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
     value
 }
 pub fn publish(app: &tauri::AppHandle) {
@@ -214,6 +215,11 @@ fn apply(app: &tauri::AppHandle, patch: &Value) -> Result<Value, String> {
             let _ = item.set_checked(prefs.side_buttons);
         }
     }
+    if previous.mirrored != prefs.mirrored {
+        if let Some(item) = s.mirror_item.lock().unwrap().as_ref() {
+            let _ = item.set_checked(prefs.mirrored);
+        }
+    }
     s.save
         .send(SaveMessage::Update(prefs))
         .map_err(|e| e.to_string())?;
@@ -307,17 +313,20 @@ type MenuParts = (
     Menu<tauri::Wry>,
     CheckMenuItem<tauri::Wry>,
     CheckMenuItem<tauri::Wry>,
+    CheckMenuItem<tauri::Wry>,
 );
-/// Right-click / tray menu (UI v2): 显示小蟹 / 键鼠联动 / 侧边按钮 / — / 设置… / 装饰… / — / 隐藏 / 退出.
+/// The pet and tray share checked display controls and common actions.
 /// The HTML lab entry only exists in debug (development) builds.
 fn make_menu(app: &tauri::AppHandle) -> tauri::Result<MenuParts> {
     let state = app.state::<AppState>();
     let enabled = state.runtime.lock().unwrap().enabled;
     let side = state.prefs.lock().unwrap().side_buttons;
+    let mirrored = state.prefs.lock().unwrap().mirrored;
     let item = |id, text| MenuItem::with_id(app, id, text, true, None::<&str>);
     let show = item("show", "显示小蟹")?;
     let input = CheckMenuItem::with_id(app, "input", "键鼠联动", true, enabled, None::<&str>)?;
     let side_buttons = CheckMenuItem::with_id(app, "side", "侧边按钮", true, side, None::<&str>)?;
+    let mirror = CheckMenuItem::with_id(app, "mirror", "镜像工位", true, mirrored, None::<&str>)?;
     let settings = item("settings", "设置…")?;
     let accessories = item("accessories", "装饰…")?;
     let hide = item("hide", "隐藏")?;
@@ -330,6 +339,7 @@ fn make_menu(app: &tauri::AppHandle) -> tauri::Result<MenuParts> {
             &show,
             &input,
             &side_buttons,
+            &mirror,
             &sep,
             &settings,
             &accessories,
@@ -343,7 +353,7 @@ fn make_menu(app: &tauri::AppHandle) -> tauri::Result<MenuParts> {
         let lab = item("lab", "打开 HTML 实验台")?;
         menu.append_items(&[&lab_sep, &lab])?;
     }
-    Ok((menu, input, side_buttons))
+    Ok((menu, input, side_buttons, mirror))
 }
 fn menu_action(app: &tauri::AppHandle, id: &str) {
     match id {
@@ -353,6 +363,12 @@ fn menu_action(app: &tauri::AppHandle, id: &str) {
         "accessories" => {
             show_main(app);
             let _ = app.emit_to("main", "clawd:accessory-open", ());
+        }
+        "mirror" => {
+            let next = !app.state::<AppState>().prefs.lock().unwrap().mirrored;
+            if apply(app, &json!({"mirrored": next})).is_err() {
+                if let Some(item) = app.state::<AppState>().mirror_item.lock().unwrap().as_ref() { let _ = item.set_checked(!next); }
+            }
         }
         "side" => {
             let next = !app.state::<AppState>().prefs.lock().unwrap().side_buttons;
@@ -421,6 +437,28 @@ fn clawd_update_settings(window: WebviewWindow, patch: Value) -> Result<Value, S
     apply(window.app_handle(), &patch)
 }
 #[tauri::command]
+fn clawd_autostart(window: WebviewWindow, enabled: bool) -> Result<(), String> {
+    authorize(&window, false)?;
+    if window.label() != "settings" { return Err("Settings window required".into()); }
+    system::set_autostart(enabled)?;
+    publish(window.app_handle());
+    Ok(())
+}
+#[tauri::command]
+async fn clawd_check_updates(window: WebviewWindow) -> Result<(), String> {
+    authorize(&window, false)?;
+    if window.label() != "settings" { return Err("Settings window required".into()); }
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || system::check_updates(&app)).await.map_err(|e| e.to_string())?
+}
+#[tauri::command]
+async fn clawd_uninstall(window: WebviewWindow) -> Result<(), String> {
+    authorize(&window, false)?;
+    if window.label() != "settings" { return Err("Settings window required".into()); }
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || system::uninstall(&app)).await.map_err(|e| e.to_string())?
+}
+#[tauri::command]
 fn clawd_menu(window: WebviewWindow) -> Result<(), String> {
     authorize(&window, true)?;
     let s = window.state::<AppState>();
@@ -461,7 +499,10 @@ fn clawd_ready(window: WebviewWindow) -> Result<(), String> {
     let s = window.state::<AppState>();
     if !s.ready.swap(true, Ordering::SeqCst) {
         window.show().map_err(|e| e.to_string())?;
-        if s.prefs.lock().unwrap().show_on_startup {
+        if (s.prefs.lock().unwrap().show_on_startup
+            && !std::env::args().any(|arg| arg == "--autostart"))
+            || std::env::args().any(|arg| arg == "--open-settings")
+        {
             spawn_settings(window.app_handle());
         }
     }
@@ -470,7 +511,8 @@ fn clawd_ready(window: WebviewWindow) -> Result<(), String> {
 pub fn run() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _, _| {
-            show_main(app)
+            show_main(app);
+            spawn_settings(app);
         }))
         .invoke_handler(tauri::generate_handler![
             clawd_snapshot,
@@ -484,7 +526,10 @@ pub fn run() {
             clawd_adjustment,
             clawd_retry,
             clawd_usage,
-            clawd_ready
+            clawd_ready,
+            clawd_autostart,
+            clawd_check_updates,
+            clawd_uninstall
         ])
         .on_menu_event(|app, event| menu_action(app, event.id().as_ref()))
         .on_window_event(|window, event| {
@@ -549,10 +594,11 @@ pub fn run() {
                 menu: Mutex::new(None),
                 input_item: Mutex::new(None),
                 side_item: Mutex::new(None),
+                mirror_item: Mutex::new(None),
             });
             let (width, height) = prefs.dimensions();
             let main = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
-                .title("Bongo Clawd Lite · 动画整合候选版")
+                .title("Bongo Clawd")
                 .inner_size(width.round(), height.round())
                 .center()
                 .decorations(false)
@@ -571,19 +617,17 @@ pub fn run() {
                 .on_navigation(local_navigation)
                 .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
                 .build()?;
-            if let Some(b) = prefs.bounds {
-                let _ = main.set_position(tauri::PhysicalPosition::new(b.x, b.y));
-                resources::ensure_visible(&main);
-            }
-            let (menu, input, side) = make_menu(app.handle())?;
+            resources::position_at_bottom_right(&main);
+            let (menu, input, side, mirror) = make_menu(app.handle())?;
             let state = app.state::<AppState>();
             *state.menu.lock().unwrap() = Some(menu.clone());
             *state.input_item.lock().unwrap() = Some(input);
             *state.side_item.lock().unwrap() = Some(side);
+            *state.mirror_item.lock().unwrap() = Some(mirror);
             let icon = tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))?;
             let tray = TrayIconBuilder::with_id("clawd-lite")
                 .icon(icon)
-                .tooltip("Bongo Clawd Lite · 动画整合候选版")
+                .tooltip("Bongo Clawd")
                 .menu(&menu)
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {

@@ -294,8 +294,9 @@ dependencies = [
 
 [[package]]
 name = "bongo-clawd-lite"
-version = "0.2.0-preview.5"
+version = "0.2.1"
 dependencies = [
+ "semver",
  "serde",
  "serde_json",
  "tauri",

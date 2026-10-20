@@ -8,7 +8,7 @@ pub struct Usage {
     pub working_set: u64,
 }
 pub fn show_startup_error(error: &str) {
-    native::message(0, "Clawd Lite · 无法启动", &format!("小蟹暂时没能启动。请确认系统是 Windows 10 / 11 x64，并已安装 Microsoft Edge WebView2 Runtime。\n\n详细信息：{error}"));
+    native::message(0, "Bongo Clawd · 无法启动", &format!("小蟹暂时没能启动。请确认系统是 Windows 10 / 11 x64，并已安装 Microsoft Edge WebView2 Runtime。\n\n详细信息：{error}"));
 }
 pub fn ensure_visible(window: &tauri::WebviewWindow) {
     let Ok(position) = window.outer_position() else {
@@ -32,6 +32,19 @@ pub fn ensure_visible(window: &tauri::WebviewWindow) {
         let _ = window.center();
     }
 }
+pub fn position_at_bottom_right(window: &tauri::WebviewWindow) {
+    let monitor = window.primary_monitor().ok().flatten()
+        .or_else(|| window.current_monitor().ok().flatten());
+    let Some(monitor) = monitor else { return; };
+    let Ok(size) = window.outer_size() else { return; };
+    let area = monitor.work_area();
+    let margin = (24.0 * monitor.scale_factor()).round() as i64;
+    let x = area.position.x as i64
+        + (area.size.width as i64 - size.width as i64 - margin).max(0);
+    let y = area.position.y as i64
+        + (area.size.height as i64 - size.height as i64 - margin).max(0);
+    let _ = window.set_position(tauri::PhysicalPosition::new(x as i32, y as i32));
+}
 pub fn show_usage(app: tauri::AppHandle) {
     let owner = app
         .get_webview_window("main")
@@ -40,7 +53,7 @@ pub fn show_usage(app: tauri::AppHandle) {
         .unwrap_or(0);
     std::thread::spawn(move || {
         let message=match native::usage(){Ok(u)=>format!("专用内存（提交量）\nRust 本体与 WebView2（{} 个进程）\n{}：{:.1} MiB\n\n工作集{}：{:.1} MiB\n成功读取：{} / {} 个进程\n\n输入监听已在 Rust 本体内，没有 PowerShell 输入进程。\n工作集合计含共享部分，可能重复计算；提交量不等于独占物理内存。\n这是即时快照；CPU 请在任务管理器中统计整个相关进程组。",u.process_count,if u.measured_count==u.process_count{"合计"}else{"已读取部分合计（非完整占用）"},u.private_bytes as f64/1048576.0,if u.measured_count==u.process_count{"合计"}else{"已读取部分合计"},u.working_set as f64/1048576.0,u.measured_count,u.process_count),Err(e)=>e};
-        native::message(owner, "Clawd Lite · 运行占用", &message);
+        native::message(owner, "Bongo Clawd · 运行占用", &message);
     });
 }
 pub fn open_lab(app: &tauri::AppHandle) {

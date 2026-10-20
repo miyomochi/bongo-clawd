@@ -85,3 +85,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .accessory-menu button:disabled{opacity:.6;cursor:default}
 [data-accessory-error]{position:absolute;left:14px;bottom:15px;margin:0;color:#f0a07f;font-size:11px}
 @media(prefers-reduced-motion:reduce){.key-top,.pause-block,.card-face,.scene,.bubble,.block .cube{transition:none!important}}
+
+/* Mirror the entire workstation, including its side controls. Text stays readable. */
+#clawd-desktop.is-mirrored{transform:scaleX(-1)}
+.is-mirrored .statistics>span,.is-mirrored [data-bubble-text],.is-mirrored [data-readable]{display:inline-block;transform:scaleX(-1)}
+.is-mirrored .accessory-menu,.is-mirrored .card-face{transform:scaleX(-1)}
+.is-mirrored .pause-block:active .card-face{transform:scaleX(-1) translateY(2px)}

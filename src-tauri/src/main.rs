@@ -5,6 +5,8 @@ mod preferences;
 mod protocol;
 mod resources;
 mod statistics;
+mod system;
+mod updates;
 fn main() {
     app::run();
 }

@@ -2,8 +2,8 @@
   'use strict';
   const bridge=window.clawdDesktop;
   // Same backend keys as before; sideButtons / bubbleLines are new and default to on when missing.
-  const ids=['alwaysOnTop','showOnStartup','breathingEnabled','statisticsEnabled','sideButtons','bubbleLines'];
-  const defaultOff=new Set(['statisticsEnabled']);
+  const ids=['alwaysOnTop','showOnStartup','breathingEnabled','statisticsEnabled','sideButtons','bubbleLines','mirrored'];
+  const defaultOff=new Set(['statisticsEnabled','mirrored']);
   const $=id=>document.getElementById(id);
   const scale=$('scale'),output=$('scale-output'),seconds=$('sleepSeconds'),status=$('save-status'),custom=$('custom-sleep');
   const presets=[60,90,300,900];
@@ -24,10 +24,12 @@
   }
   function render(value){
     current=value;
+    $('autostartEnabled').checked=value.autostartEnabled===true;
+    $('install-note').textContent=value.installed?'卸载后保留个人设置。':'便携版无需安装；退出后删除程序文件夹即可。';
     for(const id of ids)$(id).checked=defaultOff.has(id)?value[id]===true:value[id]!==false;
     if(document.activeElement!==scale)scale.value=Math.round((value.scale||1)*100);
     paintScale();paintSleep(value);
-    $('about-version').textContent='Bongo Clawd Lite '+(value.version||'')+(value.edition?' · '+value.edition:'');
+    $('about-version').textContent='Bongo Clawd '+(value.version||'')+(value.edition?' · '+value.edition:'');
     $('about-phase').textContent=phases[value.phase]||'连接中';
     $('retry-input').disabled=value.phase==='listening'&&value.running!==false;
   }
@@ -77,6 +79,18 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
   $('usage').addEventListener('click',()=>Promise.resolve(bridge.usage?.()).catch(()=>{}));
   $('retry-input').addEventListener('click',()=>Promise.resolve(bridge.retry?.()).catch(()=>{}));
+  async function systemAction(button,action){
+    button.disabled=true;$('system-status').textContent='处理中…';
+    try{await action();$('system-status').textContent='';}
+    catch(e){$('system-status').textContent=e?.message||String(e)||'操作未完成，请重试';}
+    finally{button.disabled=false;}
+  }
+  $('autostartEnabled').addEventListener('change',e=>{
+    const enabled=e.target.checked;
+    systemAction(e.target,async()=>{try{await bridge.autostart(enabled);}catch(e){$('autostartEnabled').checked=current.autostartEnabled===true;throw e;}});
+  });
+  $('check-updates').addEventListener('click',e=>systemAction(e.currentTarget,()=>bridge.checkUpdates()));
+  $('uninstall').addEventListener('click',e=>systemAction(e.currentTarget,()=>bridge.uninstall()));
   const unsubscribe=bridge.state(render);bridge.snapshot().then(render);
   window.addEventListener('beforeunload',()=>{active=false;unsubscribe();});
 })();

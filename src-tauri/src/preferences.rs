@@ -22,6 +22,7 @@ pub struct Preferences {
     pub statistics_enabled: bool,
     /// Right-hand settings / decorations / pause blocks (UI v2). Missing in old files → shown.
     pub side_buttons: bool,
+    pub mirrored: bool,
     /// Speech bubble for status lines (小蟹台词). Missing in old files → on.
     pub bubble_lines: bool,
 }
@@ -46,6 +47,7 @@ impl Default for Preferences {
             breathing_enabled: true,
             statistics_enabled: false,
             side_buttons: true,
+            mirrored: false,
             bubble_lines: true,
         }
     }
@@ -81,6 +83,7 @@ impl Preferences {
         boolean!("breathingEnabled", breathing_enabled);
         boolean!("statisticsEnabled", statistics_enabled);
         boolean!("sideButtons", side_buttons);
+        boolean!("mirrored", mirrored);
         boolean!("bubbleLines", bubble_lines);
         if let Some(n) = patch.get("scale").and_then(Value::as_f64) {
             if n.is_finite() {

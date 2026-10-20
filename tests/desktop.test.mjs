@@ -254,3 +254,16 @@ test('interrupted thought-bubble waiting leaves no polling or speech after pause
  assert.equal(s.document.querySelector('[data-bubble]').hidden,true);
  assert.equal(s.timers.size,0);s.destroy();
 });
+
+test('mirror toggles the workstation without rewriting statistics or speech',async()=>{
+ const s=setup(.2,{statisticsEnabled:true,mirrored:true});await flush();
+ const root=s.document.querySelector('#clawd-desktop');
+ assert(root.classList.contains('is-mirrored'));
+ assert.equal(s.document.querySelector('[data-statistics-total]').textContent,'1234');
+ const status=s.document.querySelector('[data-status]');status.textContent='哇！';await flush();
+ assert.equal(s.document.querySelector('[data-bubble-text]').textContent,'哇！');
+ s.state({mirrored:false});assert(!root.classList.contains('is-mirrored'));
+ s.state({mirrored:true,sideButtons:false});assert(root.classList.contains('is-mirrored'));assert(root.classList.contains('no-side'));
+ assert.equal(s.document.querySelector('[data-statistics-total]').textContent,'1234');
+ s.destroy();assert.equal(s.timers.size,0);
+});

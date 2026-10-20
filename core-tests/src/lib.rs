@@ -4,3 +4,6 @@ pub mod protocol;
 pub mod preferences;
 #[path = "../../src-tauri/src/statistics.rs"]
 pub mod statistics;
+
+#[path = "../../src-tauri/src/updates.rs"]
+pub mod updates;

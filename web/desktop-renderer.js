@@ -22,6 +22,7 @@
   function width(){return runtime.sideButtons===false?NARROW:WIDTH;}
   function layout(){
     root.classList.toggle('no-side',runtime.sideButtons===false);
+    root.classList.toggle('is-mirrored',runtime.mirrored===true);
     root.style.width=width()+'px';
     root.style.height=(HEIGHT+(controller.getState().accessory.menuOpen?DECOR:0))+'px';
     placeBubble(bubble);placeBubble(retry);

@@ -23,6 +23,9 @@
     closeSettings:()=>invoke('clawd_close_settings'),
     retry:()=>invoke('clawd_retry'),
     usage:()=>invoke('clawd_usage'),
+    autostart:enabled=>invoke('clawd_autostart',{enabled}),
+    checkUpdates:()=>invoke('clawd_check_updates'),
+    uninstall:()=>invoke('clawd_uninstall'),
     drag:()=>tauri.window.getCurrentWindow().startDragging()
   };
   document.addEventListener('DOMContentLoaded',()=>{

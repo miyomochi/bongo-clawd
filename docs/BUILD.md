@@ -38,3 +38,15 @@ python scripts/verify-assets.py
 可选浏览器桥接检查需要 `playwright-core` 和 Chromium：设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` 后运行 `node tests/browser-adapter.cjs`。这些检查模拟 Tauri 桥接，不替代 Windows 实机的 Raw Input、托盘、多屏 DPI 和资源占用验证。
 
 `Clawd-lab.html` 是基础动画实验页，独立于当前桌面功能。早期构建资料留在 `ORIGINAL-BUILD-NOTES.md` 中，当前操作以本文为准。
+
+## Windows 安装包
+
+先按上面的步骤生成便携版文件夹，安装 NSIS 3，再执行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-installer.ps1 -PackageDirectory .\dist\Bongo-Clawd-0.2.1-Windows-x64
+```
+
+默认输出 `dist/Bongo-Clawd-0.2.1-Windows-x64-Setup.exe`。如果 NSIS 不在 PATH，用 `-MakeNSIS` 指定 `makensis.exe` 的完整路径。
+
+安装仅针对当前用户，可选择有写入权限的安装目录，默认创建桌面快捷方式，同时提供开始菜单及卸载入口。卸载保留个人设置。更换已有安装的盘符时，先退出小蟹并卸载旧安装，再安装到新目录。

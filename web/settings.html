@@ -7,6 +7,7 @@
 <button type="button" role="tab" id="tab-appearance" data-tab="appearance" aria-selected="true" aria-controls="panel-appearance">外观</button>
 <button type="button" role="tab" id="tab-rest" data-tab="rest" aria-selected="false" aria-controls="panel-rest" tabindex="-1">休息</button>
 <button type="button" role="tab" id="tab-stats" data-tab="stats" aria-selected="false" aria-controls="panel-stats" tabindex="-1">统计</button>
+<button type="button" role="tab" id="tab-system" data-tab="system" aria-selected="false" aria-controls="panel-system" tabindex="-1">系统</button>
 </nav>
 <div class="body">
 <section class="panel" id="panel-appearance" data-panel="appearance" role="tabpanel" aria-labelledby="tab-appearance">
@@ -15,6 +16,7 @@
 <input id="scale" type="range" min="60" max="160" step="1" value="100">
 <div class="chips" role="group" aria-label="快捷大小"><button type="button" data-scale="75">75%</button><button type="button" data-scale="100">100%</button><button type="button" data-scale="125">125%</button><button type="button" data-scale="150">150%</button></div>
 </div>
+<label class="row switch"><span>镜像工位<small>左右翻转，按钮一起换边，文字保持正向</small></span><input id="mirrored" type="checkbox"><i aria-hidden="true"></i></label>
 <label class="row switch"><span>始终置顶</span><input id="alwaysOnTop" type="checkbox" checked><i aria-hidden="true"></i></label>
 <label class="row switch"><span>侧边按钮<small>右侧的设置、装饰、暂停方块</small></span><input id="sideButtons" type="checkbox" checked><i aria-hidden="true"></i></label>
 <label class="row switch"><span>小蟹台词<small>状态变化时在头顶冒泡</small></span><input id="bubbleLines" type="checkbox" checked><i aria-hidden="true"></i></label>
@@ -31,6 +33,12 @@
 <label class="row switch"><span>显示统计<small>键盘下方：敲击次数和近 60 秒速度</small></span><input id="statisticsEnabled" type="checkbox"><i aria-hidden="true"></i></label>
 <p class="note">只记录次数，不读取输入内容</p>
 </section>
+<section class="panel" id="panel-system" data-panel="system" role="tabpanel" aria-labelledby="tab-system" hidden>
+<label class="row switch"><span>开机自启动<small>登录 Windows 后自动显示小蟹</small></span><input id="autostartEnabled" type="checkbox"><i aria-hidden="true"></i></label>
+<div class="system-actions"><button type="button" id="check-updates">检查更新</button><button type="button" id="uninstall">卸载 Bongo Clawd</button></div>
+<p class="note" id="install-note"></p>
+<p class="note" id="system-status" role="status" aria-live="polite"></p>
+</section>
 <div class="sheet" id="help" hidden role="region" aria-label="说明">
 <h2>说明</h2>
 <p>在别的软件里打字、动鼠标，小蟹会跟着敲。按住小蟹可拖动，右键小蟹或托盘图标打开菜单。</p>
@@ -41,11 +49,11 @@
 </div>
 <div class="sheet" id="about" hidden role="region" aria-label="关于">
 <h2>关于</h2>
-<p id="about-version">Bongo Clawd Lite</p>
+<p id="about-version">Bongo Clawd</p>
 <p>联动状态：<span id="about-phase">连接中</span></p>
 <div class="sheet-actions"><button type="button" id="usage">运行占用</button><button type="button" id="retry-input">重试连接</button></div>
 </div>
 </div>
-<footer class="foot"><span id="save-status" role="status" aria-live="polite">自动保存</span><span class="foot-right"><button type="button" class="link" id="about-toggle" data-about aria-expanded="false" aria-controls="about">关于</button><label class="switch mini"><span>启动时打开</span><input id="showOnStartup" type="checkbox" checked><i aria-hidden="true"></i></label></span></footer>
+<footer class="foot"><span id="save-status" role="status" aria-live="polite">自动保存</span><span class="foot-right"><button type="button" class="link" id="about-toggle" data-about aria-expanded="false" aria-controls="about">关于</button><label class="switch mini"><span>启动时打开设置</span><input id="showOnStartup" type="checkbox" checked><i aria-hidden="true"></i></label></span></footer>
 </main>
 <script src="lite-bridge.js"></script><script src="settings-renderer.js"></script></body></html>

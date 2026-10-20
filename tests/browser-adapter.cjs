@@ -4,7 +4,7 @@ const b=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EX
 const page=await b.newPage({viewport:{width:900,height:700},offline:true});const errors=[];page.on('pageerror',e=>errors.push(String(e)));
 await page.addInitScript(()=>{
  const prefs={phase:'listening',enabled:true,running:true,scale:1,showTopBar:true,showBottomBar:true,sleepEnabled:true,sleepSeconds:90,accessory:'duck',sideButtons:true,bubbleLines:true};const listeners={};window.calls=[];window.fire=(name,payload)=>(listeners[name]||[]).forEach(f=>f({payload}));window.testPrefs=prefs;
- window.__TAURI__={core:{invoke:async(name,args)=>{window.calls.push(name);if(name==='clawd_statistics')return {total:12345,perMinute:186};if(name==='clawd_adjustment'){Object.assign(prefs,{accessoryOpen:args.open,running:!args.open,phase:args.open?'paused':'listening'});window.fire('clawd:input-batch',[{type:'reset'}]);window.fire('clawd:state',prefs);}if(name==='clawd_update_settings'){Object.assign(prefs,args.patch);window.fire('clawd:state',prefs);}if(name==='clawd_toggle'){prefs.enabled=!prefs.enabled;prefs.running=prefs.enabled;prefs.phase=prefs.enabled?'listening':'paused';window.fire('clawd:state',prefs);}if(name==='clawd_retry'){prefs.phase='listening';prefs.running=true;window.fire('clawd:state',prefs);}return {...prefs};}},event:{listen:async(name,fn)=>{(listeners[name]||=[]).push(fn);return()=>{listeners[name]=listeners[name].filter(x=>x!==fn);};}},window:{getCurrentWindow:()=>({startDragging:async()=>window.calls.push('native-drag')})}};
+ window.__TAURI__={core:{invoke:async(name,args)=>{window.calls.push(name);if(name==='clawd_autostart'){prefs.autostartEnabled=args.enabled;window.fire('clawd:state',prefs);}if(name==='clawd_statistics')return {total:12345,perMinute:186};if(name==='clawd_adjustment'){Object.assign(prefs,{accessoryOpen:args.open,running:!args.open,phase:args.open?'paused':'listening'});window.fire('clawd:input-batch',[{type:'reset'}]);window.fire('clawd:state',prefs);}if(name==='clawd_update_settings'){Object.assign(prefs,args.patch);window.fire('clawd:state',prefs);}if(name==='clawd_toggle'){prefs.enabled=!prefs.enabled;prefs.running=prefs.enabled;prefs.phase=prefs.enabled?'listening':'paused';window.fire('clawd:state',prefs);}if(name==='clawd_retry'){prefs.phase='listening';prefs.running=true;window.fire('clawd:state',prefs);}return {...prefs};}},event:{listen:async(name,fn)=>{(listeners[name]||=[]).push(fn);return()=>{listeners[name]=listeners[name].filter(x=>x!==fn);};}},window:{getCurrentWindow:()=>({startDragging:async()=>window.calls.push('native-drag')})}};
 });
 const calls=()=>page.evaluate(()=>window.calls);const height=()=>page.locator('#clawd-desktop').evaluate(n=>n.style.height);
 await page.goto(pathToFileURL(path.join(projectRoot,'web/index.html')).href);await page.waitForFunction(()=>window.clawdDesktopController);
@@ -114,6 +114,21 @@ for(const sideButtons of [true,false])for(const scale of [.6,1,1.6]){
  const stats=await page.locator('[data-statistics]').boundingBox();assert(stats.x>=0&&stats.x+stats.width<=w&&stats.y+stats.height<=300*scale+1,'statistics clipped at zoom '+scale);
  await page.locator('[data-accessory-cancel]').click();
 }
+// Mirror the workstation and controls, but preserve the text reading direction.
+await page.setViewportSize({width:900,height:700});
+await page.evaluate(()=>{Object.assign(window.testPrefs,{enabled:true,running:true,phase:'listening',scale:1,sideButtons:true,statisticsEnabled:true,mirrored:false,settingsOpen:false,popupOpen:false,accessoryOpen:false,breathingEnabled:false});window.fire('clawd:state',window.testPrefs);});
+await page.waitForTimeout(80);
+const normalButton=await page.locator('[data-settings]').boundingBox();
+const normalSlope=await page.locator('.statistics>span').evaluate(n=>{const r=document.createRange();r.selectNodeContents(n.firstChild);return {first:r.getBoundingClientRect().top,last:n.querySelector('[data-statistics-rate]').getBoundingClientRect().top};});
+await page.evaluate(()=>{window.testPrefs.mirrored=true;window.fire('clawd:state',window.testPrefs);});
+const mirrorButton=await page.locator('[data-settings]').boundingBox();assert(mirrorButton.x<normalButton.x);
+const mirrorText=await page.locator('.statistics>span').evaluate(n=>{const r=document.createRange();r.selectNodeContents(n.firstChild);const a=r.getBoundingClientRect(),b=n.querySelector('[data-statistics-rate]').getBoundingClientRect();return {firstX:a.x,lastX:b.x,firstY:a.top,lastY:b.top};});
+assert(mirrorText.firstX<mirrorText.lastX,'statistics read left to right');
+assert(normalSlope.first<normalSlope.last,'normal statistics follow the keyboard slope');
+assert(mirrorText.firstY>mirrorText.lastY,'mirrored statistics follow the opposite keyboard slope');
+if(process.env.CLAWD_PREVIEW_FONT){await page.addStyleTag({content:`@font-face{font-family:PreviewCJK;src:url("${pathToFileURL(process.env.CLAWD_PREVIEW_FONT).href}")} .statistics,.bubble{font-family:PreviewCJK,sans-serif}`});await page.evaluate(()=>document.fonts.ready);}
+if(process.env.CLAWD_MIRROR_SCREENSHOT)await page.locator('#clawd-desktop').screenshot({path:process.env.CLAWD_MIRROR_SCREENSHOT});
+
 // Settings card: tabs, size chips, sleep presets, custom clamp, footer.
 await page.setViewportSize({width:340,height:372});
 await page.goto(pathToFileURL(path.join(projectRoot,'web/settings.html')).href);await page.waitForTimeout(100);
@@ -133,8 +148,14 @@ await page.locator('#sleepSeconds').fill('99999');await page.locator('#sleepSeco
 await page.locator('#sleepSeconds').fill('240');await page.locator('#sleepSeconds').press('Enter');assert.equal(await page.evaluate(()=>window.testPrefs.sleepSeconds),240);
 await page.locator('label:has(#breathingEnabled)').click();assert.equal(await page.evaluate(()=>window.testPrefs.breathingEnabled),false);
 await page.locator('[data-tab="stats"]').click();await page.locator('label:has(#statisticsEnabled)').click();assert.equal(await page.evaluate(()=>window.testPrefs.statisticsEnabled),true);
-assert.equal(await page.locator('.note').innerText(),'只记录次数，不读取输入内容');
+assert.equal(await page.locator('#panel-stats .note').innerText(),'只记录次数，不读取输入内容');
 await page.locator('label:has(#showOnStartup)').click();assert.equal(await page.evaluate(()=>window.testPrefs.showOnStartup),false);
+await page.locator('[data-tab="system"]').click();
+await page.locator('label:has(#autostartEnabled)').click();assert.equal(await page.evaluate(()=>window.testPrefs.autostartEnabled),true);
+await page.locator('#check-updates').click();await page.locator('#uninstall').click();
+assert((await calls()).includes('clawd_check_updates'));assert((await calls()).includes('clawd_uninstall'));
+if(process.env.CLAWD_SYSTEM_SCREENSHOT)await page.screenshot({path:process.env.CLAWD_SYSTEM_SCREENSHOT});
+
 await page.locator('[data-help]').click();assert.equal(await page.locator('#help').isVisible(),true);
 await page.locator('[data-about]').click();assert.equal(await page.locator('#help').isVisible(),false);assert.equal(await page.locator('#about').isVisible(),true);
 await page.locator('#usage').click();await page.locator('#retry-input').click({force:true});
