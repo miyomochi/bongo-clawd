@@ -14,6 +14,6 @@ New-Item -ItemType Directory -Force $dist | Out-Null
 $output = Join-Path $dist "Bongo-Clawd-$Version-Windows-x64-Setup.exe"
 $icon = Join-Path $projectRoot 'src-tauri/icons/icon.ico'
 $script = Join-Path $PSScriptRoot 'installer/bongo-clawd.nsi'
-& $MakeNSIS "/DVERSION=$Version" "/DPAYLOAD=$payload" "/DICON=$icon" "/DOUTPUT=$output" $script
+& $MakeNSIS "/INPUTCHARSET" "UTF8" "/DVERSION=$Version" "/DPAYLOAD=$payload" "/DICON=$icon" "/DOUTPUT=$output" $script
 if ($LASTEXITCODE -ne 0) { throw 'NSIS compilation failed.' }
 Write-Host "Ready: $output"

@@ -42,11 +42,11 @@ Section "Bongo Clawd（必选）" MainSection
   SetOutPath "$INSTDIR"
   SetOverwrite on
   ClearErrors
-  File "${PAYLOAD}/Bongo-Clawd.exe"
+  File "${PAYLOAD}\Bongo-Clawd.exe"
   IfErrors 0 +3
     MessageBox MB_OK|MB_ICONSTOP "无法更新程序文件。请先从托盘菜单退出小蟹，再重新运行安装包。"
     Abort
-  File /r /x Bongo-Clawd.exe "${PAYLOAD}/*"
+  File /r /x Bongo-Clawd.exe "${PAYLOAD}\*"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateDirectory "$SMPROGRAMS\Bongo Clawd"
   CreateShortcut "$SMPROGRAMS\Bongo Clawd\Bongo Clawd.lnk" "$INSTDIR\Bongo-Clawd.exe" "--open-settings"
