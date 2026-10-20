@@ -8,6 +8,12 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 当前版本：**0.2.0-preview.5**，支持 **Windows 10 / 11 x64**。
 
+## 先试试看
+
+想先看看小蟹动起来？😺 [下载动画实验页（Clawd-lab.html）](https://github.com/miyomochi/bongo-clawd/raw/refs/heads/main/Clawd-lab.html)，保存后用浏览器打开就能玩，不用安装桌面程序。
+
+实验页只响应网页内的操作，适合体验基础动画；更新可能比桌面版慢，完整功能以 Windows 桌面版为准。
+
 ## 下载与使用
 
 1. 下载 [Windows x64 运行包](downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip?raw=true)。
