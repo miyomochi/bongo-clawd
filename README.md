@@ -10,19 +10,19 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 ## 先试试看
 
-想先看看小蟹动起来？😺 [下载动画实验页（Clawd-lab.html）](https://github.com/miyomochi/bongo-clawd/raw/refs/heads/main/Clawd-lab.html)，保存后用浏览器打开就能玩，不用安装桌面程序。
+想先看看小蟹动起来？😺 [下载动画体验包（ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-animation-trial.zip)，解压后用浏览器打开里面的 `Clawd-lab.html` 就能玩，不用安装桌面程序。
 
 实验页只响应网页内的操作，适合体验基础动画；更新可能比桌面版慢，完整功能以 Windows 桌面版为准。
 
 ## 下载与使用
 
-1. 下载 [Windows x64 运行包](downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip?raw=true)。
+1. 下载 [Windows x64 运行包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip)。
 2. 完整解压，双击 `Bongo-Clawd.exe`。
 3. 如果正在使用旧版，先从托盘菜单完全退出旧版，再启动新版。
 
 ！运行该程序需要系统已安装 Microsoft Edge WebView2 Runtime。若提示缺少运行时，可从 [微软官方页面](https://developer.microsoft.com/microsoft-edge/webview2/) 安装 Evergreen Runtime。
 
-旧版可从 [v0.1.0 运行包](downloads/Bongo-Clawd-Lite-Windows-x64.zip?raw=true) 下载，旧版程序名为 `Bongo-Clawd-Lite.exe`。
+旧版可从 [v0.1.0 运行包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-Lite-Windows-x64.zip) 下载，旧版程序名为 `Bongo-Clawd-Lite.exe`。
 
 ## 版本说明及更新日志
 0.2.0-增加了两种待机动画，增加头部装扮系统，优化了菜单等ui，调整了部分细节以更好适配，增加统计面板。
