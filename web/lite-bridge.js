@@ -1,4 +1,4 @@
-/* Desktop API adapter. The seven animation modules are unchanged. */
+/* Local Tauri API adapter for the desktop companion. */
 (function(){
   'use strict';
   const tauri=window.__TAURI__;
@@ -10,22 +10,28 @@
   }
   function scale(value){const root=document.getElementById('clawd-desktop');if(root&&Number.isFinite(value.scale))root.style.zoom=String(value.scale);return value;}
   window.clawdDesktop={
+    accessories:callback=>listen('clawd:accessory-open',callback),
+    adjustment:open=>invoke('clawd_adjustment',{open}),
     input:callback=>listen('clawd:input-batch',batch=>{for(const value of batch)callback(value);}),
     state:callback=>listen('clawd:state',value=>callback(scale(value))),
+    statistics:()=>invoke('clawd_statistics'),
     snapshot:()=>invoke('clawd_snapshot').then(scale),
     toggle:()=>invoke('clawd_toggle'),
     settings:()=>invoke('clawd_settings'),
     hide:()=>invoke('clawd_hide'),
     updateSettings:patch=>invoke('clawd_update_settings',{patch}),
-    closeSettings:()=>invoke('clawd_close_settings')
+    closeSettings:()=>invoke('clawd_close_settings'),
+    retry:()=>invoke('clawd_retry'),
+    usage:()=>invoke('clawd_usage'),
+    drag:()=>tauri.window.getCurrentWindow().startDragging()
   };
   document.addEventListener('DOMContentLoaded',()=>{
     if(!document.getElementById('clawd-desktop'))return;
     invoke('clawd_ready').catch(()=>{});
     document.addEventListener('mousedown',event=>{
-      if(event.button!==0||event.target.closest('button,input,textarea,select,a'))return;
-      if(event.target.closest('.scene,.handle,.footer'))tauri.window.getCurrentWindow().startDragging().catch(()=>{});
+      if(event.button!==0||event.target.closest('button,input,textarea,select,a,[data-accessory-menu]'))return;
+      if(event.target.closest('.scene,.statistics'))tauri.window.getCurrentWindow().startDragging().catch(()=>{});
     });
-    document.addEventListener('contextmenu',event=>{event.preventDefault();invoke('clawd_menu').catch(()=>{});});
+    document.addEventListener('contextmenu',event=>{event.preventDefault();if(!event.target.closest('[data-accessory-menu]'))invoke('clawd_menu').catch(()=>{});});
   });
 })();

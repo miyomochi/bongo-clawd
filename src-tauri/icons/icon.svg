@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <g fill="#d97757">
+    <rect id="body" x="10" y="10" width="44" height="36"/>
+    <rect x="3" y="26" width="7" height="11"/>
+    <rect x="54" y="26" width="7" height="11"/>
+    <rect id="leg-1" x="10" y="46" width="8" height="10"/>
+    <rect id="leg-2" x="22" y="46" width="8" height="10"/>
+    <rect id="leg-3" x="34" y="46" width="8" height="10"/>
+    <rect id="leg-4" x="46" y="46" width="8" height="10"/>
+  </g>
+  <g fill="#27221f">
+    <rect x="20" y="22" width="5" height="10"/>
+    <rect x="41" y="22" width="5" height="10"/>
+  </g>
+</svg>

@@ -1,17 +1,87 @@
-:root{color-scheme:light dark;font-family:ui-sans-serif,system-ui,"Segoe UI",sans-serif;color:light-dark(#51483c,#eee4d6)}
+/* Bongo Clawd · transparent desktop companion (UI v2). Colours follow SPEC.md. */
+:root{--bg:#2f2b27;--panel:#3a3530;--line:#4a443d;--text:#f2ebe3;--sub:#a99f94;--accent:#d9774f;--sky:#8ccbea;--paper:#f8f6f3;--front:#35312c;
+  font-family:"Segoe UI","Microsoft YaHei",ui-sans-serif,system-ui,sans-serif;color:var(--text)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;user-select:none}
-#clawd-desktop{width:440px;height:335px;padding:4px 8px 8px;display:flex;flex-direction:column}
-.handle{display:flex;align-items:center;gap:7px;height:35px;flex-shrink:0;margin-bottom:4px;padding:0 9px;border-radius:10px;background:light-dark(#faf7f0ec,#282722ed);font-size:12px}
-.handle span:first-child{font-weight:600}.connection{margin-left:auto;max-width:245px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;opacity:.8}
-.handle button,.footer button{font:inherit;color:inherit;border:0;background:transparent;border-radius:5px;padding:4px 6px}
-button:hover{background:light-dark(#e6dfd1,#4b4437)}button:focus-visible{outline:2px solid #d97757;outline-offset:1px}
-.scene{cursor:grab;touch-action:none;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-.scene svg{width:100%;height:auto;max-height:265px;display:block;pointer-events:none;filter:drop-shadow(0 5px 3px #26201618)}
-.footer{font-size:11px;display:flex;gap:8px;align-items:center;height:27px;flex-shrink:0;margin-top:4px;padding:0 8px;background:light-dark(#faf7f0ec,#282722ed);border-radius:8px}
-[data-status]{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.key.is-down .key-top,.is-clicked{fill:#f2bf72}.key-top{transition:fill 65ms linear}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 [hidden]{display:none!important}
-@media(prefers-reduced-motion:reduce){.key-top{transition:none}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-.handle [data-settings]{font-weight:700;color:#683c2d;background:#edcab5;border:1px solid #dba68b;padding:5px 9px}
+/* 388×300 logical window (352 wide without side buttons); everything is placed absolutely. */
+#clawd-desktop{position:relative;width:388px;height:300px}
+#clawd-desktop.no-side{width:352px}
+
+/* Pet: drag by holding the body (lite-bridge.js starts native dragging on .scene). */
+.scene{position:absolute;left:4px;top:26px;width:340px;height:257px;cursor:grab;touch-action:none;transition:opacity .28s ease}
 .scene:active{cursor:grabbing}
+.scene svg{width:100%;height:100%;display:block;pointer-events:none;filter:drop-shadow(0 5px 3px #26201618)}
+.key.is-down .key-top,.is-clicked{fill:#f2bf72}.key-top{transition:fill 65ms linear}
+
+/* One-line statistics under the keyboard front edge, sheared along its slope (23/124 ≈ 10.5°). */
+.statistics{position:absolute;left:77px;top:238px;transform:skewY(10.5deg);transform-origin:0 0;cursor:grab;white-space:nowrap;
+  padding:2px 6px;border:1px solid #f2ebe340;border-radius:2px;background:var(--bg);box-shadow:1px 2px 0 #0003;
+  font:700 11px/13px Consolas,"Cascadia Mono",ui-monospace,"Microsoft YaHei",monospace;letter-spacing:.5px;color:var(--text);
+  font-variant-numeric:tabular-nums}
+.statistics b{color:#f0a07f;font-weight:700}
+
+/* Speech bubble: flat pixel outline + bottom-right shadow, tail points at the head. Always on top. */
+.bubble{position:absolute;left:123px;top:28px;z-index:50;max-width:300px;white-space:nowrap;pointer-events:none;
+  padding:5px 10px;border:0;border-radius:0;background:var(--paper);color:var(--bg);font-size:13px;font-weight:700;line-height:16px;
+  box-shadow:0 0 0 2px var(--bg),4px 4px 0 2px var(--bg);transition:opacity .16s linear}
+.bubble::after{content:"";position:absolute;left:var(--tail,22px);bottom:-10px;width:10px;height:10px;background:var(--paper);
+  box-shadow:2px 2px 0 0 var(--bg),-2px 2px 0 0 var(--bg);clip-path:polygon(0 0,100% 0,0 100%)}
+.bubble.is-fading{opacity:0}
+.bubble.is-error{pointer-events:auto;cursor:pointer;box-shadow:0 0 0 2px var(--accent),4px 4px 0 2px var(--bg)}
+.bubble.is-error:hover{background:#fff}
+.bubble.is-error:active{transform:translate(1px,1px)}
+
+/* Back-leaning pixel blocks: upper edge recedes along the pet's depth axis; orange side on the left. */
+.side{transition:opacity .2s linear}
+.block{position:absolute;left:309px;width:72px;height:72px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.block-settings{top:44px}.block-accessory{top:120px}.pause-block{top:196px}
+.block .cube{display:block;width:72px;height:72px;filter:drop-shadow(2px 3px 0 #0003);transition:opacity .18s linear}
+.block:hover .cube-top{fill:#554e46}
+.block:focus-visible{outline:none}.block:focus-visible .cube{filter:drop-shadow(0 0 0 var(--accent)) drop-shadow(0 0 2px var(--accent))}
+.block[aria-expanded="true"] .cube-side{fill:var(--sky)}
+.no-side .side,.no-side .pause-block:not(.is-card){display:none}
+
+/* Pause: pet fades out and the pause block slides to the centre, becoming a draggable status card. */
+.pause-block{transition:left .36s cubic-bezier(.3,.7,.2,1),top .36s cubic-bezier(.3,.7,.2,1),width .36s cubic-bezier(.3,.7,.2,1),height .36s cubic-bezier(.3,.7,.2,1)}
+.card-face{position:absolute;inset:0;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--front);color:var(--text);
+  font-size:14px;font-weight:700;text-align:left;white-space:nowrap;opacity:0;pointer-events:none;
+  box-shadow:-10px 8px 0 var(--accent),-12px 12px 14px #0004;transition:opacity .18s linear}
+.card-face small{display:block;font-size:11px;font-weight:400;color:var(--sub);margin-top:1px}
+.play{width:0;height:0;border-left:16px solid var(--accent);border-top:10px solid transparent;border-bottom:10px solid transparent;flex-shrink:0}
+.is-paused .scene,.is-paused .statistics,.is-paused .side,.is-paused .bubble{opacity:0;pointer-events:none}
+.is-paused .pause-block{left:104px;top:118px;width:180px;height:64px;cursor:grab}
+.is-paused.no-side .pause-block{left:86px}
+.is-paused .pause-block .cube{opacity:0}
+.is-paused .pause-block .card-face{opacity:1;transition-delay:.16s}
+.is-paused .pause-block:active .card-face{transform:translateY(2px)}
+.is-paused .pause-block:active .cube{transform:none}
+
+/* Decorations: 5 thumbnails, select = preview, orange border; 取消 / 戴上. */
+.accessory-menu{position:absolute;left:8px;top:302px;width:372px;height:160px;padding:11px 14px 12px;border-radius:3px;background:var(--bg);color:var(--text);font-size:12px;
+  box-shadow:inset 0 0 0 1px var(--line)}
+.accessory-menu.is-opening{visibility:hidden}
+.no-side .accessory-menu{left:4px;width:344px;padding:10px}
+.accessory-heading{display:flex;justify-content:space-between;align-items:baseline}
+.accessory-heading b{font-size:14px}.accessory-heading span{font-size:11px;color:var(--sub);letter-spacing:1px}
+.accessory-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 0 10px}
+.no-side .accessory-options{gap:5px}
+.accessory-options label{position:relative;cursor:pointer;display:block}
+.accessory-options input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+.tile{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px 5px;border:2px solid transparent;border-radius:3px;background:var(--panel);color:var(--sub);font-size:11px;white-space:nowrap}
+.tile img{display:block;width:56px;height:38px;object-fit:contain;image-rendering:pixelated}
+.no-side .tile img{width:56px;height:38px}
+.accessory-options label:hover .tile{border-color:var(--line)}
+.accessory-options input:checked+.tile{border-color:var(--accent);color:var(--text)}
+.accessory-options input:focus-visible+.tile{outline:2px solid var(--sky);outline-offset:1px}
+.accessory-menu .actions{display:flex;justify-content:flex-end;gap:8px}
+.accessory-menu .actions button{font-size:12px;padding:5px 16px;border-radius:3px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.accessory-menu .actions button:hover{background:var(--panel)}
+.accessory-menu .actions .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.accessory-menu .actions .primary:hover{background:#e3845c}
+.accessory-menu button:disabled{opacity:.6;cursor:default}
+[data-accessory-error]{position:absolute;left:14px;bottom:15px;margin:0;color:#f0a07f;font-size:11px}
+@media(prefers-reduced-motion:reduce){.key-top,.pause-block,.card-face,.scene,.bubble,.block .cube{transition:none!important}}

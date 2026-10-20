@@ -17,7 +17,20 @@ pub struct Preferences {
     pub sleep_enabled: bool,
     pub sleep_seconds: u32,
     pub bounds: Option<Point>,
+    pub accessory: String,
+    pub breathing_enabled: bool,
+    pub statistics_enabled: bool,
+    /// Right-hand settings / decorations / pause blocks (UI v2). Missing in old files → shown.
+    pub side_buttons: bool,
+    /// Speech bubble for status lines (小蟹台词). Missing in old files → on.
+    pub bubble_lines: bool,
 }
+/// Logical main-window size (UI v2: transparent, no top/bottom bars). Keep in sync with web/desktop-renderer.js.
+pub const MAIN_WIDTH: f64 = 388.0;
+pub const MAIN_WIDTH_NO_SIDE: f64 = 352.0;
+pub const MAIN_HEIGHT: f64 = 300.0;
+/// Extra height while the decorations card is open below the pet.
+pub const DECORATIONS_HEIGHT: f64 = 166.0;
 impl Default for Preferences {
     fn default() -> Self {
         Self {
@@ -29,6 +42,11 @@ impl Default for Preferences {
             sleep_enabled: true,
             sleep_seconds: 90,
             bounds: None,
+            accessory: "none".into(),
+            breathing_enabled: true,
+            statistics_enabled: false,
+            side_buttons: true,
+            bubble_lines: true,
         }
     }
 }
@@ -40,6 +58,12 @@ impl Preferences {
             1.0
         };
         self.sleep_seconds = self.sleep_seconds.clamp(30, 3600);
+        if !matches!(
+            self.accessory.as_str(),
+            "none" | "headphones" | "cat-headphones" | "sprout" | "duck"
+        ) {
+            self.accessory = "none".into();
+        }
     }
     pub fn patch(&mut self, patch: &Value) {
         macro_rules! boolean {
@@ -54,6 +78,10 @@ impl Preferences {
         boolean!("showBottomBar", show_bottom_bar);
         boolean!("showOnStartup", show_on_startup);
         boolean!("sleepEnabled", sleep_enabled);
+        boolean!("breathingEnabled", breathing_enabled);
+        boolean!("statisticsEnabled", statistics_enabled);
+        boolean!("sideButtons", side_buttons);
+        boolean!("bubbleLines", bubble_lines);
         if let Some(n) = patch.get("scale").and_then(Value::as_f64) {
             if n.is_finite() {
                 self.scale = n;
@@ -64,15 +92,26 @@ impl Preferences {
                 self.sleep_seconds = n.clamp(30.0, 3600.0).round() as u32;
             }
         }
+        if let Some(value) = patch.get("accessory").and_then(Value::as_str) {
+            if matches!(
+                value,
+                "none" | "headphones" | "cat-headphones" | "sprout" | "duck"
+            ) {
+                self.accessory = value.into();
+            }
+        }
         self.sanitize();
     }
+    /// The statistics line sits inside the pet area and the bars no longer exist, so only the
+    /// side-button column changes the size. `showTopBar` / `showBottomBar` are kept for old files only.
     pub fn dimensions(&self) -> (f64, f64) {
         (
-            440.0 * self.scale,
-            (335.0
-                - if self.show_top_bar { 0.0 } else { 39.0 }
-                - if self.show_bottom_bar { 0.0 } else { 31.0 })
-                * self.scale,
+            if self.side_buttons {
+                MAIN_WIDTH
+            } else {
+                MAIN_WIDTH_NO_SIDE
+            } * self.scale,
+            MAIN_HEIGHT * self.scale,
         )
     }
 }
@@ -80,10 +119,11 @@ impl Preferences {
 mod tests {
     use super::*;
     #[test]
-    fn defaults_match_electron() {
+    fn defaults_keep_ninety_second_sleep() {
         let p = Preferences::default();
         assert_eq!(p.sleep_seconds, 90);
-        assert_eq!(p.dimensions(), (440.0, 335.0));
+        assert_eq!(p.dimensions(), (388.0, 300.0));
+        assert!(p.side_buttons && p.bubble_lines);
     }
     #[test]
     fn patch_only_accepts_known_typed_fields() {
@@ -101,7 +141,50 @@ mod tests {
         p.patch(&serde_json::json!({"scale":9,"sleepSeconds":0,"showTopBar":false,"showBottomBar":false}));
         assert_eq!(p.scale, 1.6);
         assert_eq!(p.sleep_seconds, 30);
-        assert_eq!(p.dimensions(), (704.0, 424.0));
+        let (w, h) = p.dimensions();
+        assert!((w - 388.0 * 1.6).abs() < 1e-9 && h == 480.0, "{w}x{h}");
+    }
+    #[test]
+    fn accessory_migrates_and_rejects_unknown_values() {
+        let mut p: Preferences = serde_json::from_str(r#"{"scale":1.0}"#).unwrap();
+        assert_eq!(p.accessory, "none");
+        p.patch(&serde_json::json!({"accessory":"duck"}));
+        p.patch(&serde_json::json!({"accessory":"unknown"}));
+        assert_eq!(p.accessory, "duck");
+        p.accessory = "unknown".into();
+        p.sanitize();
+        assert_eq!(p.accessory, "none");
+    }
+    #[test]
+    fn optional_counters_and_breathing_migrate_without_saving_counts() {
+        let mut p: Preferences = serde_json::from_str(r#"{"scale":1}"#).unwrap();
+        assert!(p.breathing_enabled);
+        assert!(!p.statistics_enabled);
+        p.patch(
+            &serde_json::json!({"statisticsEnabled":true,"breathingEnabled":false,"total":1234}),
+        );
+        assert!(!p.breathing_enabled);
+        assert!(p.statistics_enabled);
+        assert_eq!(p.dimensions(), (388.0, 300.0));
+        assert!(serde_json::to_value(&p).unwrap().get("total").is_none());
+        p.patch(&serde_json::json!({"showTopBar":false,"showBottomBar":false,"scale":1.17}));
+        assert!((p.dimensions().1 - 351.0).abs() < 0.001);
+    }
+    #[test]
+    fn side_buttons_and_bubble_lines_migrate_on_and_toggle() {
+        let mut p: Preferences =
+            serde_json::from_str(r#"{"scale":1,"showTopBar":false,"statisticsEnabled":true}"#)
+                .unwrap();
+        assert!(p.side_buttons);
+        assert!(p.bubble_lines);
+        p.patch(&serde_json::json!({"sideButtons":false,"bubbleLines":false}));
+        assert!(!p.side_buttons && !p.bubble_lines);
+        assert_eq!(p.dimensions(), (352.0, 300.0));
+        p.patch(&serde_json::json!({"sideButtons":"yes","bubbleLines":1}));
+        assert!(!p.side_buttons && !p.bubble_lines);
+        let v = serde_json::to_value(&p).unwrap();
+        assert_eq!(v["sideButtons"], false);
+        assert_eq!(v["bubbleLines"], false);
     }
     #[test]
     fn preferences_round_trip() {

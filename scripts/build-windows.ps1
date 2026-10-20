@@ -5,19 +5,19 @@ try {
     & cargo build --manifest-path src-tauri/Cargo.toml --target x86_64-pc-windows-msvc --release --locked
     if ($LASTEXITCODE -ne 0) { throw 'Cargo build failed; see the error above.' }
     $dist = Join-Path $projectRoot 'dist'
-    $package = Join-Path $dist 'Bongo-Clawd-Lite-Windows-x64'
+    $package = Join-Path $dist 'Bongo-Clawd-0.2.0-preview.5-Windows-x64'
     New-Item -ItemType Directory -Force $package | Out-Null
-    Copy-Item 'src-tauri/target/x86_64-pc-windows-msvc/release/bongo-clawd-lite.exe' (Join-Path $package 'Bongo-Clawd-Lite.exe') -Force
-    foreach ($name in @('README-FIRST.txt', 'COMPARISON.md', 'VALIDATION.md', 'THIRD-PARTY-NOTICES.md', 'LICENSE-CODE.txt')) {
+    Copy-Item 'src-tauri/target/x86_64-pc-windows-msvc/release/bongo-clawd-lite.exe' (Join-Path $package 'Bongo-Clawd.exe') -Force
+    foreach ($name in @('README-FIRST.txt', 'COMPARISON.md', 'VALIDATION.md', 'THIRD-PARTY-NOTICES.md', 'LICENSE-CODE.txt', 'VALIDATION-RESULTS.json')) {
         Copy-Item $name $package -Force
     }
     Copy-Item 'rust-licenses' $package -Recurse -Force
-    $exe = Join-Path $package 'Bongo-Clawd-Lite.exe'
+    $exe = Join-Path $package 'Bongo-Clawd.exe'
     $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
-    "$hash  Bongo-Clawd-Lite.exe" | Set-Content (Join-Path $package 'SHA256SUMS.txt') -Encoding ascii
+    "$hash  Bongo-Clawd.exe" | Set-Content (Join-Path $package 'SHA256SUMS.txt') -Encoding ascii
     $items = Get-ChildItem $package -File -Recurse
     $metrics = [ordered]@{
-        version = '0.1.0-preview.1'
+        version = '0.2.0-preview.5'
         exe_bytes = (Get-Item $exe).Length
         portable_files_bytes_before_metrics = ($items | Measure-Object Length -Sum).Sum
         runtime_bundled = $false
@@ -26,7 +26,7 @@ try {
         build = 'Windows local rebuild; run the validation steps on this machine'
     }
     $metrics | ConvertTo-Json | Set-Content (Join-Path $package 'package-metrics.json') -Encoding UTF8
-    $zip = Join-Path $dist 'Bongo-Clawd-Lite-Windows-x64.zip'
+    $zip = Join-Path $dist 'Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip'
     Compress-Archive -Path $package -DestinationPath $zip -Force
     Write-Host "Ready: $zip"
 } finally { Pop-Location }

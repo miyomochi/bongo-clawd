@@ -7,6 +7,26 @@ pub enum InputEvent {
     Button { button: u8, down: bool },
     Reset,
 }
+/// Transient native pressed-state for autorepeat filtering, never serialized or logged.
+#[derive(Default)]
+pub struct PhysicalPresses(std::collections::HashSet<(usize, u16, u16, u16)>);
+impl PhysicalPresses {
+    pub fn update(&mut self, device: usize, scan: u16, flags: u16, vk: u16) -> bool {
+        if vk == 255 || scan == 0xff {
+            return false;
+        }
+        let physical = (device, scan, flags & 6, vk);
+        if flags & 1 != 0 {
+            self.0.remove(&physical);
+            false
+        } else {
+            vk == 19 || self.0.insert(physical)
+        }
+    }
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+}
 pub fn key_event(scan: u16, flags: u16, vk: u16) -> Option<InputEvent> {
     if vk == 255 || scan == 0xff {
         return None;
@@ -96,6 +116,25 @@ mod tests {
             s,
             serde_json::json!({"type":"key","code":"KeyA","down":true})
         );
+    }
+    #[test]
+    fn physical_counts_reject_repeat_and_separate_modifiers_and_devices() {
+        let mut pressed = PhysicalPresses::default();
+        assert!(pressed.update(1, 30, 0, 65));
+        for _ in 0..100 {
+            assert!(!pressed.update(1, 30, 0, 65));
+        }
+        assert!(pressed.update(1, 29, 0, 17));
+        assert!(pressed.update(1, 29, 2, 17));
+        assert!(pressed.update(2, 30, 0, 65));
+        assert!(!pressed.update(1, 30, 1, 65));
+        assert!(pressed.update(1, 30, 0, 65));
+        assert!(!pressed.update(1, 0xff, 0, 255));
+        // Pause can lack a matching key-up, so it must not stay held forever.
+        assert!(pressed.update(1, 69, 4, 19));
+        assert!(pressed.update(1, 69, 4, 19));
+        pressed.clear();
+        assert!(pressed.update(1, 30, 0, 65));
     }
     #[test]
     fn all_keys_match_frozen_map() {

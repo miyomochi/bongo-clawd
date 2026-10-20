@@ -3,6 +3,8 @@
   'use strict';
   const modules=global.ClawdModules || (global.ClawdModules={});
   modules.wake=function(ctx) {
+    const pretendEnd=4600,wakeEnd=5200;
+    ctx.wakeCalmStart=pretendEnd;
     function stopWake() {
       clearTimeout(ctx.wakeTimer);ctx.wakeTimer=null;
       ctx.wakePhase='none';ctx.wakeClock=0;ctx.wakeX=ctx.wakeY=ctx.wakeEyeX=0;
@@ -23,10 +25,10 @@
       function tick() {
         if(ctx.disposed || ctx.wakePhase==='none')return;
         const t=performance.now()-ctx.wakeStart;ctx.wakeClock=t;
-        if(t>=4200) {
-          stopWake();clearTimeout(ctx.activityTimer);ctx.activityTick();ctx.queueLook();ctx.refreshStatus();return;
+        if(t>=wakeEnd) {
+          stopWake();clearTimeout(ctx.activityTimer);ctx.activityTick();ctx.queueLook();ctx.queueEgg();ctx.refreshStatus();return;
         }
-        ctx.wakePhase=t<440 ? 'startled' : t<1000 ? 'checking' : t<3600 ? 'pretending' : 'calming';
+        ctx.wakePhase=t<440 ? 'startled' : t<1000 ? 'checking' : t<pretendEnd ? 'pretending' : 'calming';
         ctx.wakeY=t<360 ? -Math.round(9*Math.sin(Math.PI*t/360)) : t<440 ? 2 : 0;
         ctx.wakeX=t>=440&&t<700 ? -1 : t>=700&&t<1000 ? 1 : 0;
         ctx.wakeEyeX=t>=440&&t<700 ? -4 : t>=700&&t<1000 ? 4 : 0;

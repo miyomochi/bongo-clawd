@@ -4,6 +4,7 @@ mod input;
 mod preferences;
 mod protocol;
 mod resources;
+mod statistics;
 fn main() {
     app::run();
 }

@@ -1,1 +1,2 @@
+765b6520596ab3133139a99150502b1f1003c422f8e025c018844dc751084914  Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip
 65e3eb13b6c9a739ebf5be9a73bace34ff525d39ebcf16eb1767ad8290eb0d51  Bongo-Clawd-Lite-Windows-x64.zip

@@ -3,8 +3,13 @@
   'use strict';
   const modules = global.ClawdModules || (global.ClawdModules = {});
   modules.demo = function (ctx) {
+    function prepareDemo(){
+      if(ctx.coolPhase==='none'&&ctx.happyPhase==='none')ctx.clearAll();
+      else {clearTimeout(ctx.demoTimer);cancelAnimationFrame(ctx.demoFrame);}
+    }
+
     function demoTyping() {
-      ctx.clearAll();
+      prepareDemo();
       const codes=['KeyC','KeyJ','KeyA','KeyK','KeyD','Space','KeyW','KeyO','KeyR','KeyL'];
       const delays=[380,380,350,320,280,240,210,180,160,140,120,110];
       let i=0;
@@ -18,7 +23,7 @@
     }
 
     function demoMouse() {
-      ctx.clearAll();
+      prepareDemo();
       const start = performance.now();
       function frame(now) {
         const t = Math.min(1, (now-start)/1000);
@@ -29,7 +34,7 @@
     }
 
     function demoMixed(){
-      ctx.clearAll();let i=0;const codes=['KeyA','KeyW','KeyS','KeyD'];
+      prepareDemo();let i=0;const codes=['KeyA','KeyW','KeyS','KeyD'];
       function next(){
         if(ctx.disposed||i>=12)return;
         ctx.moveMouse(Math.sin(i*.6)*3,Math.cos(i*.6)*2);ctx.tap(codes[i%codes.length]);
@@ -41,14 +46,21 @@
     function bindDemo() {
     ctx.root.querySelectorAll('[data-action]').forEach(button => {
       ctx.listen(button, 'click', () => {
+        if(ctx.isAdjusting?.())return;
         const action = button.dataset.action;
-        if (action === 'left') { ctx.tap('KeyA'); }
+        if(action==='cool'){ctx.clearAll();ctx.startCool();}
+        else if(action==='happy'){
+          if(ctx.sleepPhase!=='awake'||ctx.wakePhase!=='none'||ctx.level||performance.now()<ctx.recoveryUntil)return;
+          ctx.stopCool(false);ctx.stopHappy(false);if(ctx.looking)ctx.stopLook();ctx.startHappy(ctx.root.querySelector('[data-motif-select]')?.value);
+        }
+        else if(action==='dream'){ctx.clearAll();ctx.startSleep();ctx.demoTimer=setTimeout(()=>ctx.startDream(ctx.root.querySelector('[data-motif-select]')?.value),2600);}
+        else if (action === 'left') { ctx.tap('KeyA'); }
         else if (action === 'right') { ctx.tap('KeyJ'); }
         else if (action === 'mouse') {if(ctx.sleepPhase==='asleep' || ctx.wakePhase!=='none')ctx.moveMouse(2,0);else ctx.demoMouse();}
         else if (action === 'wake') ctx.startWake();
         else if (action === 'demo') ctx.demoTyping();
         else if (action === 'mixed') demoMixed();
-        else if (action === 'sleep') { ctx.clearAll();ctx.startSleep(); }
+        else if (action === 'sleep') { ctx.clearAll({preserveSunglasses:true});ctx.startSleep(); }
         else if (action === 'look') { ctx.clearAll();ctx.lookCount=0;ctx.lookLimit=1;ctx.startLook(); }
       });
     });

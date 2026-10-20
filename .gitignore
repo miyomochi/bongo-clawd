@@ -1,14 +1,19 @@
 /dist/
 /**/target/
 /node_modules/
-*.zip
-
 /src-tauri/gen/
-/core-tests/target/
+*.zip
+*.exe
 *.log
+*.pyc
+__pycache__/
 .DS_Store
 Thumbs.db
+.env
+.env.*
+!.env.example
 
-# Keep the reviewed portable package available for direct download.
+# Reviewed portable downloads are intentionally versioned.
 !/downloads/
 !/downloads/Bongo-Clawd-Lite-Windows-x64.zip
+!/downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip

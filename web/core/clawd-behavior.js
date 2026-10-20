@@ -3,6 +3,22 @@
   'use strict';
   const modules = global.ClawdModules || (global.ClawdModules = {});
   modules.behavior = function (ctx) {
+    // Choose once per episode, never on animation ticks. Keep cycling across idle resets.
+    const lookLines=['好安静啊','……人呢？','嗯？没人吧……'];
+    const fastLines=['忙不过来了！','Ultra Clawding!!'];
+    let lookLineIndex=0,fastLineIndex=0;
+    const enterDwell=600,exitDwell=2400;
+    let riseSince=null,fallSince=null;
+    function stableLevel(candidate,now){
+      if(candidate>ctx.level){
+        fallSince=null;if(riseSince===null)riseSince=now;
+        if(now-riseSince>=enterDwell){riseSince=null;return candidate;}
+      }else if(candidate<ctx.level){
+        riseSince=null;if(fallSince===null)fallSince=now;
+        if(now-fallSince>=exitDwell){fallSince=null;return candidate;}
+      }else riseSince=fallSince=null;
+      return ctx.level;
+    }
     function stopLook() {
       clearTimeout(ctx.lookTimer); ctx.lookTimer=null;
       ctx.looking=false; ctx.lookX=ctx.lookY=ctx.eyeX=ctx.eyeY=0; ctx.squint=false;
@@ -10,7 +26,9 @@
     }
 
     function queueLook(delay=12000+Math.random()*6000) {
+      if(ctx.isAdjusting?.())return;
       clearTimeout(ctx.idleTimer);
+      if ((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none')){if(ctx.sleepEnabled)ctx.queueSleep(0);return;}
       if (ctx.disposed || ctx.sleepPhase!=='awake' || ctx.wakePhase!=='none') return;
       const remaining=ctx.sleepDelayMs-2400-(performance.now()-ctx.idleSince);
       if(ctx.sleepEnabled){
@@ -35,13 +53,15 @@
       else if(ctx.sleepPhase!=='awake')ctx.stopSleep();
       if(ctx.looking)ctx.stopLook();
       ctx.lookCount=0; ctx.lookLimit=1+Math.floor(Math.random()*2);
-      ctx.queueLook();
+      ctx.queueLook();ctx.queueEgg();
     }
 
     function startLook() {
+      if((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none'))return;
       if(ctx.disposed || ctx.sleepPhase!=='awake' || ctx.wakePhase!=='none' || ctx.held.size || ctx.level || performance.now()<ctx.recoveryUntil || ctx.mouseMode) return;
       clearTimeout(ctx.idleTimer); ctx.stopLook();
       ctx.looking=true;ctx.lookStart=performance.now();ctx.lookCount++;
+      ctx.lookCaption=lookLines[lookLineIndex++%lookLines.length];
       function tick() {
         if(ctx.disposed || !ctx.looking)return;
         const t=performance.now()-ctx.lookStart;
@@ -69,13 +89,17 @@
       }
       const recent = ctx.hits.length && now-ctx.hits[ctx.hits.length-1] < 1100;
       const sustained = ctx.hits.length >= 12 && ctx.hits[ctx.hits.length-1]-ctx.hits[0] >= 1000;
-      const next = recent && sustained ? (ctx.rate >= (ctx.level===2 ? 7.5 : 9) ? 2 : ctx.rate >= (ctx.level ? 4.5 : 6) ? 1 : 0) : 0;
+      const candidate = recent && sustained ? (ctx.rate >= (ctx.level===2 ? 7.5 : 9) ? 2 : ctx.rate >= (ctx.level ? 4.5 : 6) ? 1 : 0) : 0;
+      const next=stableLevel(candidate,now);
+      if(next===2&&!ctx.fastCaption)ctx.fastCaption=fastLines[fastLineIndex++%fastLines.length];
+      if(!next)ctx.fastCaption=null;
       if (next && !ctx.level) { ctx.enteringUntil=now+240; ctx.nextSurge=now+1400+Math.random()*500; }
       if (!next && ctx.level) { ctx.enteringUntil=0; ctx.recoveryStart=now; ctx.recoveryUntil=now+3500; }
       if (next) ctx.recoveryUntil=0;
       if (ctx.recoveryUntil && now>=ctx.recoveryUntil) ctx.recoveryUntil=0;
       ctx.root.dataset.recovering=String(now<ctx.recoveryUntil);
       ctx.level=next; ctx.root.dataset.busy=String(ctx.level);
+      if((ctx.level||now<ctx.recoveryUntil)&&ctx.happyPhase==='smiling')ctx.popHappy();
       if (!ctx.level) { ctx.nextSurge=Infinity; ctx.surgeUntil=0; }
       else {
         if (now >= ctx.nextSurge) { ctx.surgeUntil=now+650; ctx.nextSurge=now+4000+Math.random()*2500; }
@@ -86,15 +110,18 @@
     }
 
     function resetActivity() {
+      riseSince=fallSince=null;
       clearTimeout(ctx.activityTimer); ctx.activityTimer=null;
       cancelAnimationFrame(ctx.particleFrame); ctx.particleFrame=null;
       ctx.hits=[]; ctx.particles.forEach(p=>p.el.remove()); ctx.particles=[];
       ctx.recoveryUntil=ctx.recoveryStart=ctx.enteringUntil=0; ctx.lastStroke=-Infinity; ctx.root.dataset.recovering='false';
       ctx.level=ctx.rate=0; ctx.nextSurge=Infinity; ctx.surgeUntil=0; ctx.nextDrop=0;
+      ctx.fastCaption=null;
       ctx.root.dataset.busy='0'; ctx.refreshEyes(); ctx.renderBody();
     }
 
     function scheduleBlink() {
+      if(ctx.isAdjusting?.())return;
       ctx.blinkTimer = setTimeout(() => {
         if (ctx.disposed) return;
         if (!document.hidden) {

@@ -1,21 +1,51 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · 小工位设置</title><link rel="stylesheet" href="settings.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · 设置</title><link rel="stylesheet" href="settings.css"></head>
 <body>
-<header><div class="mark" aria-hidden="true">▣</div><div><span class="eyebrow">LITTLE PAWS, BIG WORK.</span><h1>小蟹的小工位 · Lite</h1><p>调到舒服的大小，让 Clawd 陪你工作。</p></div></header>
-<main>
-<section class="intro"><strong>先认识一下小家伙</strong><p>在其他应用打字、移动鼠标，小蟹也会跟着啪嗒。按住本体或键盘就能拖走；右键或托盘图标可随时打开菜单。</p><p>只响应物理键位和鼠标动作，不读取或保存你输入的文字。</p></section>
-<section><div class="section-title"><h2>外观与位置</h2><span>即时生效</span></div>
-<label class="range-label" for="scale">小蟹大小 <output id="scale-output" for="scale">100%</output></label>
-<input id="scale" type="range" min="60" max="160" step="1" value="100"><div class="range-hints"><span>60%</span><button id="reset-size" type="button">恢复 100%</button><span>160%</span></div>
-<label class="check"><span>始终置顶<small>在其他窗口前陪你</small></span><input id="alwaysOnTop" type="checkbox" checked></label>
-<label class="check"><span>显示顶部栏<small>连接状态、隐藏与设置入口</small></span><input id="showTopBar" type="checkbox" checked></label>
-<label class="check"><span>显示底部栏<small>动作提示与暂停按钮</small></span><input id="showBottomBar" type="checkbox" checked></label>
-<p class="hint">上下栏都关闭，就只留下小蟹。右键小蟹或使用托盘菜单，可重新打开设置。</p></section>
-<section><h2>休息与睡眠</h2>
-<label class="check"><span>空闲时自动睡眠<small>先偷偷看看，再伸懒腰、打个盹</small></span><input id="sleepEnabled" type="checkbox" checked></label>
-<label class="number-label" for="sleepSeconds">没有键鼠活动 <span><input id="sleepSeconds" type="number" value="90" min="30" max="3600" step="1" inputmode="numeric"> 秒后睡着</span></label>
-<p class="hint" id="sleep-note">默认 90 秒；可设 30～3600 秒。新的键鼠活动会重新计时，睡着后会被惊醒。</p>
+<main class="card">
+<header class="head"><h1>设置</h1><button id="help-toggle" class="icon" type="button" data-help aria-expanded="false" aria-controls="help" title="说明">?</button></header>
+<nav class="tabs" role="tablist" aria-label="设置分类">
+<button type="button" role="tab" id="tab-appearance" data-tab="appearance" aria-selected="true" aria-controls="panel-appearance">外观</button>
+<button type="button" role="tab" id="tab-rest" data-tab="rest" aria-selected="false" aria-controls="panel-rest" tabindex="-1">休息</button>
+<button type="button" role="tab" id="tab-stats" data-tab="stats" aria-selected="false" aria-controls="panel-stats" tabindex="-1">统计</button>
+</nav>
+<div class="body">
+<section class="panel" id="panel-appearance" data-panel="appearance" role="tabpanel" aria-labelledby="tab-appearance">
+<div class="field">
+<div class="row"><label for="scale">大小</label><output id="scale-output" for="scale">100%</output></div>
+<input id="scale" type="range" min="60" max="160" step="1" value="100">
+<div class="chips" role="group" aria-label="快捷大小"><button type="button" data-scale="75">75%</button><button type="button" data-scale="100">100%</button><button type="button" data-scale="125">125%</button><button type="button" data-scale="150">150%</button></div>
+</div>
+<label class="row switch"><span>始终置顶</span><input id="alwaysOnTop" type="checkbox" checked><i aria-hidden="true"></i></label>
+<label class="row switch"><span>侧边按钮<small>右侧的设置、装饰、暂停方块</small></span><input id="sideButtons" type="checkbox" checked><i aria-hidden="true"></i></label>
+<label class="row switch"><span>小蟹台词<small>状态变化时在头顶冒泡</small></span><input id="bubbleLines" type="checkbox" checked><i aria-hidden="true"></i></label>
 </section>
-<section><h2>启动与说明</h2><label class="check"><span>启动时显示本页<small>关闭后，仍可从设置或托盘回来</small></span><input id="showOnStartup" type="checkbox" checked></label><p class="hint">在下方暂停可暂时断开全局联动。隐藏窗口会留在托盘；完全退出请用托盘菜单。这是轻量对比候选版，配置与 Electron 版分开保存。</p><button id="toggle-input" type="button" class="secondary">暂停全局联动</button></section>
-</main><footer><span id="save-status" role="status" aria-live="polite">设置会自动保存</span><button id="done" type="button" class="primary">让小蟹开工</button></footer>
+<section class="panel" id="panel-rest" data-panel="rest" role="tabpanel" aria-labelledby="tab-rest" hidden>
+<label class="row switch"><span>呼吸动画</span><input id="breathingEnabled" type="checkbox" checked><i aria-hidden="true"></i></label>
+<div class="field">
+<div class="row"><span id="sleep-label">空闲后入睡</span></div>
+<div class="chips" role="radiogroup" aria-labelledby="sleep-label" id="sleep-chips"><button type="button" role="radio" data-sleep="60">1分钟</button><button type="button" role="radio" data-sleep="90">90秒</button><button type="button" role="radio" data-sleep="300">5分钟</button><button type="button" role="radio" data-sleep="900">15分钟</button><button type="button" role="radio" data-sleep="never">从不</button><button type="button" role="radio" data-sleep="custom">自定义</button></div>
+<div class="custom" id="custom-sleep" hidden><input id="sleepSeconds" type="number" value="90" min="30" max="3600" step="1" inputmode="numeric" aria-label="入睡秒数"><span>秒</span><small>30–3600，超出按边界</small></div>
+</div>
+</section>
+<section class="panel" id="panel-stats" data-panel="stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+<label class="row switch"><span>显示统计<small>键盘下方：敲击次数和近 60 秒速度</small></span><input id="statisticsEnabled" type="checkbox"><i aria-hidden="true"></i></label>
+<p class="note">只记录次数，不读取输入内容</p>
+</section>
+<div class="sheet" id="help" hidden role="region" aria-label="说明">
+<h2>说明</h2>
+<p>在别的软件里打字、动鼠标，小蟹会跟着敲。按住小蟹可拖动，右键小蟹或托盘图标打开菜单。</p>
+<p>只响应物理按键和鼠标动作，不读取、不保存输入的文字。</p>
+<p>关掉侧边按钮后，设置、装饰和暂停（键鼠联动）都在右键菜单与托盘里。</p>
+<p>统计只在内存里累计，按住连发算一次，鼠标不计入；关闭统计或退出后清零，速度按近 60 秒计算。</p>
+<p>隐藏后小蟹留在托盘，完全退出请用托盘菜单。</p>
+</div>
+<div class="sheet" id="about" hidden role="region" aria-label="关于">
+<h2>关于</h2>
+<p id="about-version">Bongo Clawd Lite</p>
+<p>联动状态：<span id="about-phase">连接中</span></p>
+<div class="sheet-actions"><button type="button" id="usage">运行占用</button><button type="button" id="retry-input">重试连接</button></div>
+</div>
+</div>
+<footer class="foot"><span id="save-status" role="status" aria-live="polite">自动保存</span><span class="foot-right"><button type="button" class="link" id="about-toggle" data-about aria-expanded="false" aria-controls="about">关于</button><label class="switch mini"><span>启动时打开</span><input id="showOnStartup" type="checkbox" checked><i aria-hidden="true"></i></label></span></footer>
+</main>
 <script src="lite-bridge.js"></script><script src="settings-renderer.js"></script></body></html>

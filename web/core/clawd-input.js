@@ -20,6 +20,7 @@
     }
 
     function press(code, options = {}) {
+      if(ctx.isAdjusting?.())return false;
       const k = ctx.lookup.get(code);
       if (!k || ctx.disposed) return false;
       let hand=k.hand;
@@ -45,6 +46,7 @@
     }
 
     function release(code, immediate = false) {
+      if(ctx.isAdjusting?.())return false;
       if (!ctx.lookup.has(code)) return;
       if(ctx.held.has(code))ctx.markActivity();
       ctx.held.delete(code);
@@ -65,11 +67,12 @@
     }
 
     function moveMouse(dx, dy) {
+      if(ctx.isAdjusting?.())return false;
       if (ctx.disposed) return;
       ctx.markActivity();
       if(ctx.wakePhase!=='none'){ctx.lastKey.textContent='Mouse · 被发现了';ctx.refreshStatus();return;}
       const leftHeld=[...ctx.held].some(code=>ctx.lookup.get(code)?.hand==='left'||code==='Space');
-      if(!leftHeld && performance.now()-ctx.lastLeftStroke>300)ctx.resetActivity();
+      if(!leftHeld && performance.now()-ctx.lastLeftStroke>300&&!ctx.level)ctx.resetActivity();
       ctx.cancelHand('right');
       clearTimeout(ctx.mouseTimer);
       if (!ctx.mouseMode) {
@@ -94,6 +97,7 @@
     }
 
     function mouseButton(button, down) {
+      if(ctx.isAdjusting?.())return false;
       if(button!==0 && button!==2)return;
       ctx.markActivity();
       if(down)ctx.mouseButtons.add(button);else ctx.mouseButtons.delete(button);
@@ -104,7 +108,7 @@
 
     function bindInput() {
     ctx.listen(ctx.root, 'keydown', e => {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button,[data-accessory-menu],[data-accessory-open]')) return;
       clearTimeout(ctx.demoTimer);
       cancelAnimationFrame(ctx.demoFrame);
       // KeyboardEvent.code tracks the physical position, including left/right Shift.
@@ -129,7 +133,7 @@
       ctx.moveMouse(ctx.mouseX, ctx.mouseY);
       ctx.mouseButton(e.button, true);
     });
-    ctx.listen(global, 'pointerup', e => ctx.mouseButton(e.button,false));
+    ctx.listen(global, 'pointerup', e => {if(!e.target?.closest?.('[data-accessory-menu],[data-accessory-open]'))ctx.mouseButton(e.button,false);});
     ctx.listen(global, 'pointercancel', () => { ctx.mouseButton(0,false);ctx.mouseButton(2,false); });
     ctx.listen(ctx.zone, 'contextmenu', e => e.preventDefault());
     

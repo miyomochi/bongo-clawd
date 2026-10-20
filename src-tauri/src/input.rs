@@ -13,13 +13,12 @@ pub struct InputService {
 impl InputService {
     pub fn start(app: tauri::AppHandle) -> Self {
         let hwnd = Arc::new(AtomicIsize::new(0));
-        let desired = Arc::new(AtomicBool::new(
-            app.state::<crate::app::AppState>()
-                .runtime
-                .lock()
-                .unwrap()
-                .enabled,
-        ));
+        let desired = Arc::new(AtomicBool::new({
+            let s = app.state::<crate::app::AppState>();
+            let enabled = s.runtime.lock().unwrap().enabled;
+            let adjusting = s.adjustments.lock().unwrap().any();
+            enabled && !adjusting
+        }));
         let stopping = Arc::new(AtomicBool::new(false));
         let (h, d, s) = (hwnd.clone(), desired.clone(), stopping.clone());
         let thread = std::thread::spawn(move || {
@@ -73,6 +72,7 @@ mod native {
         dy: i64,
         timer: bool,
         absolute: Option<(i32, i32)>,
+        held: crate::protocol::PhysicalPresses,
     }
     pub fn notify(hwnd: isize, close: bool) {
         if hwnd != 0 {
@@ -91,6 +91,7 @@ mod native {
         ctx.dx = 0;
         ctx.dy = 0;
         ctx.absolute = None;
+        ctx.held.clear();
         let _ = ctx
             .app
             .emit_to("main", "clawd:input-batch", vec![InputEvent::Reset]);
@@ -199,6 +200,17 @@ mod native {
             && bytes >= header + size_of::<RAWKEYBOARD>() as u32
         {
             let k = raw.data.keyboard;
+            if ctx
+                .held
+                .update(raw.header.hDevice as usize, k.MakeCode, k.Flags, k.VKey)
+            {
+                ctx.app
+                    .state::<crate::app::AppState>()
+                    .statistics
+                    .lock()
+                    .unwrap()
+                    .record();
+            }
             if let Some(event) = key_event(k.MakeCode, k.Flags, k.VKey) {
                 push_bounded(&mut ctx.queue, event);
             }
@@ -312,6 +324,7 @@ mod native {
                 dy: 0,
                 timer: false,
                 absolute: None,
+                held: crate::protocol::PhysicalPresses::default(),
             });
             // Hidden top-level window receives suspend broadcasts as well as session changes.
             let hwnd = CreateWindowExW(

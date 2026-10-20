@@ -4,8 +4,9 @@
   function createClawdController(root, rig, options={}) {
     const svg = root.querySelector('#clawd-scene');
     const ctx = {
-      root, rig, svg,
+      root, rig, svg,paused:false,breathingEnabled:options.breathingEnabled===true,accessoryStorage:options.accessoryStorage!==false,coolEnabled:options.sunglassesEnabled===true,happyEnabled:options.happyEnabled===true,
       sleepEnabled:options.sleepEnabled!==false,sleepDelayMs:90000,idleSince:performance.now(),
+      onAccessoryConfirmed:typeof options.onAccessoryConfirmed==='function'?options.onAccessoryConfirmed:null,
       zone:root.querySelector('[data-mouse-zone]'),
       status:root.querySelector('[data-status]'), lastKey:root.querySelector('[data-last-key]'),
       lookup:new Map(rig.keys.map(k=>[k.code,k])),
@@ -33,11 +34,15 @@
       startledEyes:'eyes-startled',wakeBubble:'wake-bubble',sneakEyes:'eyes-sneak',sweat:'sweat-particles',sleepSymbols:'sleep-symbols',armClip:'far-arm-visible',raisedClip:'raised-arms-visible'
     };
     for (const [name,id] of Object.entries(nodes)) ctx[name]=svg.querySelector('#'+id);
-    for (const name of ['renderer','behavior','sleep','wake','input','demo']) {
+    for (const name of ['renderer','behavior','sleep','wake','input','demo','cool','happy','eggs','headphones']) {
       if (!global.ClawdModules?.[name]) throw new Error('Missing Clawd module: '+name);
       Object.assign(ctx,global.ClawdModules[name](ctx));
     }
-    function clearAll() {
+    function clearAll(options={}) {
+      ctx.clearing=true;ctx.stopBreathing();
+      ctx.stopAccessoryPreview?.(false);
+      ctx.stopEggTimer();ctx.stopHappy(false);
+      if(!options.preserveSunglasses)ctx.stopCool(false);
       clearTimeout(ctx.idleTimer);ctx.stopWake();ctx.stopSleep();ctx.stopLook();
       clearTimeout(ctx.demoTimer);
       cancelAnimationFrame(ctx.demoFrame);
@@ -51,9 +56,11 @@
       ctx.stopMouse(); ctx.pose('left', 'idle'); ctx.pose('right', 'idle');
       ctx.bounceOffset=0; ctx.resetActivity();
       ctx.body.removeAttribute('transform'); ctx.hands.removeAttribute('transform');
-      ctx.refreshStatus();ctx.setStatus('小蟹就位', 'idle');
+      ctx.refreshStatus();ctx.setStatus('工作中', 'idle');ctx.clearing=false;
     }
     function configure(prefs={}) {
+      if(typeof prefs.breathingEnabled==='boolean')ctx.breathingEnabled=prefs.breathingEnabled;
+      ctx.renderBody();
       if(typeof prefs.sleepEnabled==='boolean')ctx.sleepEnabled=prefs.sleepEnabled;
       if(Number.isFinite(prefs.sleepSeconds))ctx.sleepDelayMs=Math.max(30,Math.min(3600,prefs.sleepSeconds))*1000;
       clearTimeout(ctx.idleTimer);
@@ -61,23 +68,40 @@
       ctx.queueLook();
     }
     ctx.clearAll=clearAll;
+    function setPaused(value){
+      if(ctx.disposed||ctx.paused===!!value)return;
+      ctx.paused=!!value;
+      if(ctx.paused){
+        clearAll();clearTimeout(ctx.blinkTimer);clearTimeout(ctx.blinkEnd);
+        ctx.blinkTimer=ctx.blinkEnd=null;ctx.blinking=false;ctx.refreshEyes();
+      }else if(!ctx.isAdjusting()){
+        ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();ctx.renderBody();
+        if(!ctx.reduceMotion)ctx.scheduleBlink();
+      }
+      ctx.refreshStatus();
+    }
+    for(const name of ['startCool','startHappy','startDream','startLook','startSleep','startWake']){
+      const fn=ctx[name];ctx[name]=(...args)=>ctx.isAdjusting()?false:fn(...args);
+    }
     configure(options);
+    ctx.queueEgg();
     if(options.bindInput!==false)ctx.bindInput();
-    if(options.bindDemo!==false)ctx.bindDemo();
+    if(options.bindDemo!==false){ctx.bindDemo();ctx.bindAccessories();}
     ctx.lookLimit=1+Math.floor(Math.random()*2); ctx.queueLook();
     if (!ctx.reduceMotion) ctx.scheduleBlink();
     return {
       press:ctx.press, release:ctx.release, tap:ctx.tap, moveMouse:ctx.moveMouse,mouseButton:ctx.mouseButton,
-      clearAll,configure,resumeIdle:()=>{ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();}, lookAround:ctx.startLook, sleep:ctx.startSleep, wake:ctx.startWake,
+      openAccessoryMenu:ctx.openAccessoryMenu,selectAccessory:ctx.selectAccessory,closeAccessoryMenu:ctx.closeAccessoryMenu,restoreAccessory:ctx.restoreAccessory,setPaused,
+      clearAll,configure,resumeIdle:()=>{ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();ctx.renderBody();}, showSunglasses:ctx.startCool,showHappy:ctx.startHappy,showDream:ctx.startDream, lookAround:ctx.startLook, sleep:ctx.startSleep, wake:ctx.startWake,
       getState:()=>({
-        keys:[...ctx.active],left:root.dataset.left||'idle',right:root.dataset.right||'idle',
+        paused:ctx.paused,breathingEnabled:ctx.breathingEnabled,accessory:ctx.accessoryState(),happy:ctx.happyPhase,happyMode:ctx.happyMode,bubbleMotif:ctx.happyMotif,cool:ctx.coolPhase,coolClock:ctx.coolClock,coolLeftOwned:ctx.coolOwnsLeft(),keys:[...ctx.active],left:root.dataset.left||'idle',right:root.dataset.right||'idle',
         sleepEnabled:ctx.sleepEnabled,sleepSeconds:ctx.sleepDelayMs/1000,
         wake:ctx.wakePhase,wakeClock:ctx.wakeClock,sleep:ctx.sleepPhase,sleepArmFrame:ctx.sleepArmFrame,mouse:ctx.mouseMode,looking:ctx.looking,idleLooks:ctx.lookCount,idleLookLimit:ctx.lookLimit,
         busy:ctx.level,recovering:performance.now()<ctx.recoveryUntil,rate:ctx.rate,
         expression:root.dataset.expression||'open',particles:ctx.particles.length
       }),
       destroy() {
-        clearAll();ctx.disposed=true;
+        ctx.disposed=true;clearAll();
         clearTimeout(ctx.blinkTimer);clearTimeout(ctx.blinkEnd);
         ctx.cleanup.forEach(fn=>fn());ctx.blinking=false;ctx.refreshEyes();
       }
