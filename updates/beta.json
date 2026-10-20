@@ -1,0 +1,6 @@
+{
+  "version": "0.3.1-beta.1",
+  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip",
+  "sha256": "368b8c7a13e1d3ac27914ba3fba9c6822fa96ef01fd9cfc82579260d77464401",
+  "notes": "不稳定的 Beta 更新功能试验。包含稳定版 0.3.0 的手臂方向感和四种戳一戳；新增每日首次启动检查（默认关闭）、新版日志、今日不再提示、下载进度和 SHA256 校验，由 Windows 安装向导完成更新。检查时蓝色浮屏敲键盘，发现新版举灯泡，成功挥魔法棒；失败会晕晕并显示放大的红色 ERROR，关闭提示后恢复正常。更新安装与重启全过程仍待真实 Windows 桌面验证。"
+}

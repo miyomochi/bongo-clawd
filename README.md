@@ -111,4 +111,6 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 - **稳定版 0.3.0**：可选的小幅手臂方向感，以及正式采用的戳一戳互动。保留手动检查更新。
 - **beta 0.3.1-beta.1**：包含稳定版功能，额外试验每天自动检查、下载校验、安装与动画。不稳定，愿意尝鲜再选。
-- 稳定版只读取正式更新；beta 尚待授权发布，稳定版不会主动切换到 beta。
+- 稳定版只读取正式更新，不会主动切换到 beta。
+
+愿意尝鲜可选 **不稳定 Beta 0.3.1-beta.1**：[安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip) · [免安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip)。自动检查默认关闭，可在设置 → 系统开启。Beta 与稳定版共用安装目录和配置，替换使用。[功能、检查结果及当前限制](docs/BETA-0.3.1-beta.1.md)。

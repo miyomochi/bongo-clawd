@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-20",
+  "version": "0.3.1-beta.1",
+  "channel": "beta",
+  "source_commit": "e17be70268b668295d829bc8561bef6f60a7ed28",
+  "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39447043102",
+  "checks": {
+    "node": 98,
+    "rust_core": 21,
+    "candidate_assets": 34,
+    "icon_assets": 3,
+    "windows_msvc_release": "passed",
+    "nsis": "passed",
+    "windows_powershell_exact_extraction": "sha256 matched",
+    "unknown_installer_entry": "rejected",
+    "runtime_zip_hash_crc": "passed",
+    "portable_exe": "Windows x64 PE verified",
+    "real_windows_desktop_update_install_restart": "not yet tested"
+  }
+}
