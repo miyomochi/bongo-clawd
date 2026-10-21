@@ -58,6 +58,9 @@
    active=null;cancelAnimationFrame(frame);frame=null;overlay.setAttribute('display','none');blush.setAttribute('display','none');
    if(scratch){ctx.left.removeAttribute('transform');api.pose('left','idle');scratch=false;}
    ctx.root.dataset.reaction='none';api.refreshEyes();api.renderBody();ctx.refreshStatus();
+   if(!ctx.disposed&&!ctx.paused&&!ctx.isAdjusting?.()){
+    ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();
+   }
   }
   function tick(time){
    frame=null;if(ctx.disposed||!active)return;now=time;
@@ -67,19 +70,24 @@
   }
   function react(kind){
    if(ctx.disposed||ctx.paused||ctx.isAdjusting?.())return false;
-   if(active&&performance.now()-started<180&&(kind===active||!Object.hasOwn(names,kind)))return false;
+   if(active)return false;
    stopReaction();ctx.clearAll();
    const choices=Object.keys(names).filter(k=>k!==last);
    active=Object.hasOwn(names,kind)?kind:choices[Math.floor(Math.random()*choices.length)];last=active;
    now=started=performance.now();ctx.root.dataset.reaction=active;ctx.setStatus(names[active],'reaction');tick(now);return true;
   }
   ctx.stopClickReaction=stopReaction;
+  ctx.isClickReacting=()=>active!==null;
   instances.set(ctx.root,{react,cancelReaction:stopReaction,getReaction:()=>active});
   return {...api,refreshEyes,renderBody};
  };
  global.ClawdModules.input=function(ctx){
-  const api=input(ctx);
-  return {...api,press(...args){ctx.stopClickReaction?.();return api.press(...args);},moveMouse(...args){ctx.stopClickReaction?.();return api.moveMouse(...args);}};
+  const api=input(ctx),guarded={...api};
+  // A reaction owns the hands until its last frame. Ignore input, never queue it.
+  for(const name of ['press','release','tap','moveMouse','mouseButton']){
+   guarded[name]=(...args)=>ctx.isClickReacting?.()?false:api[name](...args);
+  }
+  return guarded;
  };
  const create=global.createClawdController;
  global.createClawdController=function(root,rig,options={}){

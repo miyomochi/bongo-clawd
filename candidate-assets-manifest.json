@@ -12,8 +12,8 @@
   "core/clawd-sleep.js": "789b2dd39fe81ed20c05569a0ef9ebb5c7d3a81097ee501e37a822e280c779a5",
   "core/clawd-wake.js": "9b10508b7b55b14f6cfad049c519bce78c3386aa7a1a40441be5e91855cfa152",
   "core/clawd.bundle.js": "c4602ebdd4c4c065c03d81ac508b5c42978470107b7dbe1eba474a829e898c31",
-  "desktop-renderer.js": "84ebbf0b0bab61f1941015ede3c6caf1c4071dcb6187852cc8712c5fea95398b",
-  "desktop.css": "59f7e6cc9d0b5c6770ee1ed6b4b36f1ac1720b9d4265d259508b98b2c78292fd",
+  "desktop-renderer.js": "943cac79dd9c60f111d210c6a2ad2c4dad6456f61119fb30748fe27ee9cd8ddf",
+  "desktop.css": "32993ee686ab475446823812e70dc180310a2c322d5f2f62cea8916ae7977515",
   "index.html": "26b86eeb13a565faec4ac10d2c20d5c950e56a8bf61b4dcbaa664f901af56617",
   "lite-bridge.js": "1d461060fb7e34e47324db65a7dfe0de45dbd50414d64e140e0e9e16739eac62",
   "rig-data.json": "a958168389ac8669d48de8a8e9c23a1ed81b8e0c09cada8127db426f7e75d62c",
@@ -27,5 +27,5 @@
   "thumbs/sprout.png": "206ea85b0c506f80de2434095e75980b031c553400fb0f8bf84911dd7279b22e",
   "button-press.js": "1f4cb73be8ab01450930e6424c0bd41cc9890d1d57a1f0c6cad9a8e13efcbb1e",
   "core/clawd-reach.js": "a21ff6750364159d9630d95184fda5e26c87562ec6a4f07f9333c00ef31d2211",
-  "core/clawd-reactions.js": "34f32efb83e6417cb6dfe430687d3859604d3f75953e0b9c400335fcebb18754"
+  "core/clawd-reactions.js": "409dd1d79baf7b808fc1fceb8b8095fb7b14b75713e6eb887f87b4b21b5ed48f"
 }
