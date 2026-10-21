@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
-      REPAIR_ARTIFACTS: ${{ runner.temp }}/repair-artifacts
+      REPAIR_ARTIFACTS: /tmp/bongo-clawd-repair-artifacts
     steps:
       - uses: actions/checkout@v4
         with:
