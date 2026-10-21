@@ -11,10 +11,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 #clawd-desktop{position:relative;width:388px;height:300px}
 #clawd-desktop.no-side{width:352px}
 
-/* Pet: drag by holding the body (lite-bridge.js starts native dragging on .scene). */
+/* SVG shapes must receive pointer hits so the renderer can distinguish body taps from scene dragging. */
 .scene{position:absolute;left:4px;top:26px;width:340px;height:257px;cursor:grab;touch-action:none;transition:opacity .28s ease}
 .scene:active{cursor:grabbing}
-.scene svg{width:100%;height:100%;display:block;pointer-events:none;filter:drop-shadow(0 5px 3px #26201618)}
+.scene svg{width:100%;height:100%;display:block;filter:drop-shadow(0 5px 3px #26201618)}
 .key.is-down .key-top,.is-clicked{fill:#f2bf72}.key-top{transition:fill 65ms linear}
 
 /* One-line statistics under the keyboard front edge, sheared along its slope (23/124 ≈ 10.5°). */

@@ -294,7 +294,7 @@ dependencies = [
 
 [[package]]
 name = "bongo-clawd-lite"
-version = "0.3.1-beta.1"
+version = "0.3.1-beta"
 dependencies = [
  "chrono",
  "semver",

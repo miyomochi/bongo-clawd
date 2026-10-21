@@ -1,13 +1,29 @@
 {
-  "date": "2026-10-20",
-  "version": "0.3.1-beta.1",
+  "date": "2026-10-21",
+  "version": "0.3.1-beta",
   "channel": "beta",
   "checks": {
-    "frontend": "passed locally; animation, desktop, settings, gesture event routes",
-    "rust_core": "pending Windows build",
-    "windows_runtime": "not_run_for_this_version",
-    "installer": "pending Windows build",
-    "updater": "simulation passed; Windows update service and installer pending"
+    "click_playthrough_targeted": 2,
+    "edition_separation": "verified; updater only in beta",
+    "native_statistics": "unchanged",
+    "candidate_assets": 34,
+    "icon_assets": 3,
+    "windows_x64_build": "see Windows repair workflow result",
+    "installer": "see Windows repair workflow result",
+    "windows_runtime": "final rebuilt package not independently device-tested"
   },
-  "note": "0.2.1 runtime approval does not apply to 0.3.0."
+  "baseline_verification": {
+    "date": "2026-10-20",
+    "version": "0.3.1-beta.1",
+    "channel": "beta",
+    "checks": {
+      "frontend": "passed locally; animation, desktop, settings, gesture event routes",
+      "rust_core": "pending Windows build",
+      "windows_runtime": "not_run_for_this_version",
+      "installer": "pending Windows build",
+      "updater": "simulation passed; Windows update service and installer pending"
+    },
+    "note": "0.2.1 runtime approval does not apply to 0.3.0."
+  },
+  "note": "This repair runs only relevant checks per user request; prior full-suite results belong to the baseline. No claim of complete Windows update/install/restart device verification."
 }

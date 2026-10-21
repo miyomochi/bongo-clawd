@@ -279,14 +279,32 @@ test('directional arms are optional and preference updates keep the chosen anima
  s.input({type:'key',code:'KeyA',down:false});s.advance(300);s.input({type:'key',code:'KeyJ',down:true});s.advance(80);
  assert.equal(s.document.querySelector('[data-reaching-arm]'),null);s.destroy();assert.equal(s.timers.size,0);
 });
-test('desktop body tap owns raw mouse input, plays a reaction, and real typing interrupts it',()=>{
+test('desktop body tap plays through keyboard input before work resumes',()=>{
  const s=setup(),body=s.document.querySelector('#body-motion');
  pointer(s,body,'pointerover');s.input({type:'move',dx:4,dy:2});s.advance(20);assert.equal(s.c.getState().mouse,false);
  pointer(s,body,'pointerdown');s.input({type:'button',button:0,down:true});s.advance(80);
  pointer(s,body,'pointerup');assert(s.c.getReaction());assert.equal(s.c.getState().mouse,false);
  s.input({type:'button',button:0,down:false});s.input({type:'move',dx:1,dy:0});s.advance(20);assert(s.c.getReaction());
- s.input({type:'key',code:'KeyA',down:true});assert.equal(s.c.getReaction(),null);assert(s.c.getState().keys.includes('KeyA'));
+ const reaction=s.c.getReaction();
+ s.input({type:'key',code:'KeyA',down:true});s.input({type:'key',code:'KeyA',down:false});assert.equal(s.c.getReaction(),reaction);assert.equal(s.c.getState().keys.length,0);
+ s.advance(2700);assert.equal(s.c.getReaction(),null);assert.equal(s.c.getState().keys.length,0);
+ s.input({type:'key',code:'KeyJ',down:true});assert(s.c.getState().keys.includes('KeyJ'));
  s.destroy();assert.equal(s.timers.size,0);
+});
+test('all four click reactions play through mouse, reset and repeated taps without replaying input',()=>{
+ for(const [kind,duration] of [['curious',2100],['shy',1900],['jelly',1200],['sing',2600]]){
+  const s=setup();assert(s.c.react(kind));s.advance(400);
+  s.input({type:'move',dx:12,dy:3});s.input({type:'button',button:0,down:true});s.input({type:'button',button:0,down:false});
+  s.input({type:'key',code:'KeyA',down:true});s.input({type:'reset'});
+  assert.equal(s.c.press('KeyJ'),false);s.c.moveMouse(5,1);s.c.mouseButton(2,true);s.c.tap('Space');
+  assert.equal(s.c.react('random'),false);assert.equal(s.c.getReaction(),kind);
+  assert.equal(s.c.getState().mouse,false);assert.equal(s.c.getState().keys.length,0);
+  s.advance(duration-450);assert.equal(s.c.getReaction(),kind,'play the final frames');
+  s.advance(100);assert.equal(s.c.getReaction(),null);assert.equal(s.c.getState().keys.length,0);assert.equal(s.c.getState().mouse,false);
+  s.input({type:'key',code:'KeyA',down:false});s.input({type:'key',code:'KeyJ',down:true});assert(s.c.getState().keys.includes('KeyJ'));
+  s.input({type:'key',code:'KeyJ',down:false});s.input({type:'move',dx:2,dy:1});s.advance(20);assert.equal(s.c.getState().mouse,true);
+  s.destroy();assert.equal(s.timers.size,0);
+ }
 });
 test('desktop drag, long press, right click and pointer cancellation never trigger a tap',async()=>{
  const s=setup(),body=s.document.querySelector('#body-motion');let drags=0;s.window.clawdDesktop.drag=async()=>{drags++;};

@@ -4,7 +4,7 @@ Unicode true
 !include "FileFunc.nsh"
 Var UpdateMode
 !ifndef VERSION
-!define VERSION "0.3.1-beta.1"
+!define VERSION "0.3.1-beta"
 !endif
 Name "Bongo Clawd"
 OutFile "${OUTPUT}"

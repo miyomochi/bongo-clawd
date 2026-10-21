@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <g shape-rendering="geometricPrecision">
+    <rect id="icon-background" x="0" y="0" width="64" height="64" rx="14" fill="#2f2b27"/>
+    <rect id="icon-outline" x="2" y="2" width="60" height="60" rx="12" fill="#d97757" data-min-size="32"/>
+    <rect x="3.5" y="3.5" width="57" height="57" rx="10.5" fill="#2f2b27"/>
+  </g>
+  <g transform="translate(6.4 7) scale(.8)">
   <g fill="#d97757">
     <rect id="body" x="10" y="10" width="44" height="36"/>
     <rect x="3" y="26" width="7" height="11"/>
@@ -11,5 +17,6 @@
   <g fill="#27221f">
     <rect x="20" y="22" width="5" height="10"/>
     <rect x="41" y="22" width="5" height="10"/>
+  </g>
   </g>
 </svg>

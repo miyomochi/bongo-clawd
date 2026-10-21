@@ -115,8 +115,9 @@
   }
   function input(value){
     if(disposed||!value)return;
-    if(value.type==='reset'){forgetInput();if(runtime.update?.phase&&runtime.update.phase!=='idle')return;if(!adjusting()){controller.clearAll();if(runtime.running&&!controller.getState().paused)controller.resumeIdle();}return;}
+    if(value.type==='reset'){forgetInput();if(controller.getReaction())return;if(runtime.update?.phase&&runtime.update.phase!=='idle')return;if(!adjusting()){controller.clearAll();if(runtime.running&&!controller.getState().paused)controller.resumeIdle();}return;}
     if((runtime.update?.phase&&runtime.update.phase!=='idle')||controller.getState().paused||adjusting()||!runtime.enabled||runtime.settingsOpen||runtime.popupOpen)return;
+    if(controller.getReaction()){forgetInput();return;}
     if(value.type==='key'){
       if(value.code==='Pause'){if(value.down)controller.tap('Pause');return;}
       if(value.down){if(controller.press(value.code,{repeat:held.has(value.code)}))held.add(value.code);}
@@ -172,7 +173,7 @@
   root.addEventListener('pointermove',e=>{
     if(!gesture){bodyHovered=isBody(e.target);if(bodyHovered)dropMouse();return;}
     if(e.pointerId!==gesture.id||Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<=6)return;
-    const id=gesture.id;gesture=null;nativeDragging=true;controller.cancelReaction();dropMouse();
+    const id=gesture.id;gesture=null;nativeDragging=true;dropMouse();
     if(root.hasPointerCapture?.(id))root.releasePointerCapture(id);
     Promise.resolve(bridge.drag?.()).catch(()=>{}).finally(()=>{nativeDragging=false;});
   });
