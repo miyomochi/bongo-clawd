@@ -17,7 +17,8 @@ pub fn parse_release(bytes: &[u8], current: &str) -> Result<(Release, bool), Str
         .map_err(|_| "更新版本号无效。".to_string())?;
     let installed = semver::Version::parse(current)
         .map_err(|_| "当前版本号无效。".to_string())?;
-    if !latest.pre.is_empty() && (installed.pre.is_empty() || !latest.pre.as_str().starts_with("beta.")) {
+    if !latest.pre.is_empty() && (installed.pre.is_empty()
+        || !(latest.pre.as_str() == "beta" || latest.pre.as_str().starts_with("beta."))) {
         return Err("更新信息尚未正式发布。".into());
     }
     let url = &release.download_url;
@@ -54,6 +55,9 @@ mod tests {
     }
     #[test]
     fn beta_updates_require_opted_in_beta_installation() {
+        assert!(!parse_release(&manifest("0.3.1-beta"), "0.3.1-beta").unwrap().1);
+        assert!(parse_release(&manifest("0.3.2-beta"), "0.3.1-beta").unwrap().1);
+        assert!(parse_release(&manifest("0.3.1-beta"), "0.3.0").is_err());
         assert!(parse_release(&manifest("0.3.1-beta.2"), "0.3.1-beta.1").unwrap().1);
         assert!(parse_release(&manifest("0.3.1-beta.2"), "0.3.0").is_err());
         assert!(parse_release(&manifest("0.3.1"), "0.3.1-beta.1").unwrap().1);
