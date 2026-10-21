@@ -1,0 +1,29 @@
+name: Publish archived releases
+on:
+  push:
+    branches: ['publish/release-catalog-20261021']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Exact catalog tag to publish or verify (all for archive import)'
+        required: true
+        default: all
+permissions:
+  contents: write
+concurrency:
+  group: publish-archived-releases
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify packages and publish release catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || 'all' }}
+        run: python scripts/publish-releases.py --publish --tag "$RELEASE_TAG"

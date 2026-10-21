@@ -9,6 +9,8 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 当前稳定版：**0.3.0**，支持 **Windows 10 / 11 x64**。
 
+[最新稳定版](https://github.com/miyomochi/bongo-clawd/releases/latest) · [Beta 试验版](https://github.com/miyomochi/bongo-clawd/releases/tag/v0.3.1-beta.1) · [全部版本与历史下载](https://github.com/miyomochi/bongo-clawd/releases)
+
 ## 先试试看
 
 想先看看小蟹动起来？😺 [下载动画体验包（ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-animation-trial.zip)，解压后用浏览器打开里面的 `Clawd-lab.html` 就能玩，不用安装桌面程序。
@@ -19,17 +21,17 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 **Windows 安全提示**：目前这是个人同好项目，暂未购买代码签名证书(对我来说有点昂贵了TT)。安装包及便携版中的 EXE 均未进行数字签名，Windows 可能显示“未知发布者”“Windows 已保护你的电脑”，或按设备策略阻止运行，想使用要在更多信息里允许一下。只是请确认文件来自本仓库，并按需核对 [SHA-256 校验值](downloads/SHA256SUMS.txt)，再自行决定是否运行。便携版同样可能出现这些提示。
 
-1. 下载 [Windows x64 安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip)。
+1. 下载 [Windows x64 安装包](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.0/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip)。
 2. 解压后运行 `Bongo-Clawd-0.3.0-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
 3. 如果正在使用旧版，先从托盘菜单完全退出旧版。更换安装盘符时先卸载旧安装，再安装到新目录；个人设置会保留。
 
-不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。这个更透明一点。
+不想使用安装程序，也可下载 [便携版运行包（免安装 ZIP）](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.0/Bongo-Clawd-0.3.0-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。这个更透明一点。
 
 ！运行该程序需要系统已安装 Microsoft Edge WebView2 Runtime。若提示缺少运行时，可从 [微软官方页面](https://developer.microsoft.com/microsoft-edge/webview2/) 安装 Evergreen Runtime。
 
-上一版 [0.2.0 便携运行包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip) 继续保留。
+历史版本已整理到 [Releases 版本索引](https://github.com/miyomochi/bongo-clawd/releases)，包括 [0.2.1](https://github.com/miyomochi/bongo-clawd/releases/tag/v0.2.1)、[0.2.0-preview.5](https://github.com/miyomochi/bongo-clawd/releases/tag/v0.2.0-preview.5) 和 [0.1.0 初版归档](https://github.com/miyomochi/bongo-clawd/releases/tag/v0.1.0)。每版单独保留更新说明、原始运行包和校验值；旧包仅供回退参考。
 
-旧版可从 [v0.1.0 运行包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-Lite-Windows-x64.zip) 下载，旧版程序名为 `Bongo-Clawd-Lite.exe`。
+在版本页底部展开 **Assets**：`Setup.zip` 是安装包，另一个 Windows ZIP 是便携版；`Source code` 是源码，不能直接运行。初版沿用内部版本号 `0.1.0-preview.1` 的 Lite 原始构建，程序名为 `Bongo-Clawd-Lite.exe`。
 
 ## 版本说明及更新日志
 0.3.1 beta-尝试加入了自动更新机制(更早版本还需要手动卸载安装，辛苦了。)但不好做检查，先归为试验版。
@@ -115,4 +117,4 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 - **beta 0.3.1-beta.1**：包含稳定版功能，额外试验每天自动检查、下载校验、安装与动画。不稳定，愿意尝鲜再选。
 - 稳定版只读取正式更新，不会主动切换到 beta。
 
-愿意尝鲜可选 **不稳定 Beta 0.3.1-beta.1**：[安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip) · [免安装包](https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip)。自动检查默认关闭，可在设置 → 系统开启。Beta 与稳定版共用安装目录和配置，替换使用。[功能、检查结果及当前限制](docs/BETA-0.3.1-beta.1.md)。
+愿意尝鲜可选 **不稳定 Beta 0.3.1-beta.1**：[安装包](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.1-beta.1/Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip) · [免安装包](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.1-beta.1/Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip)。自动检查默认关闭，可在设置 → 系统开启。Beta 与稳定版共用安装目录和配置，替换使用。[功能、检查结果及当前限制](docs/BETA-0.3.1-beta.1.md)。

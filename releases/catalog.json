@@ -1,0 +1,84 @@
+[
+  {
+    "tag": "v0.1.0",
+    "title": "0.1.0 · 初版历史归档",
+    "target": "de22d49c9145328b8093c9286d543f4b23c8a3ac",
+    "prerelease": false,
+    "latest": false,
+    "notes": "releases/v0.1.0.md",
+    "assets": [
+      {
+        "name": "Bongo-Clawd-Lite-Windows-x64.zip",
+        "sha256": "65e3eb13b6c9a739ebf5be9a73bace34ff525d39ebcf16eb1767ad8290eb0d51"
+      }
+    ]
+  },
+  {
+    "tag": "v0.2.0-preview.5",
+    "title": "0.2.0-preview.5 · 历史预览版",
+    "target": "4e7403f3170256ed32b937f6ae73601f5839741b",
+    "prerelease": true,
+    "latest": false,
+    "notes": "releases/v0.2.0-preview.5.md",
+    "assets": [
+      {
+        "name": "Bongo-Clawd-0.2.0-preview.5-Windows-x64.zip",
+        "sha256": "765b6520596ab3133139a99150502b1f1003c422f8e025c018844dc751084914"
+      }
+    ]
+  },
+  {
+    "tag": "v0.2.1",
+    "title": "0.2.1 · 历史稳定版",
+    "target": "989576853152b0bbace4fbd61673e807717eeea6",
+    "prerelease": false,
+    "latest": false,
+    "notes": "releases/v0.2.1.md",
+    "assets": [
+      {
+        "name": "Bongo-Clawd-0.2.1-Windows-x64-Setup.zip",
+        "sha256": "46e4b103f26f86d28f956f7f688ace1d916275402ab9a8b1214830da96998c68"
+      },
+      {
+        "name": "Bongo-Clawd-0.2.1-Windows-x64.zip",
+        "sha256": "b1d2a0d38550bf9425034ceb249a9ed7f2e6abdacfb3e90c460ea342d31a7963"
+      }
+    ]
+  },
+  {
+    "tag": "v0.3.1-beta.1",
+    "title": "0.3.1-beta.1 · 不稳定试验版",
+    "target": "e17be70268b668295d829bc8561bef6f60a7ed28",
+    "prerelease": true,
+    "latest": false,
+    "notes": "releases/v0.3.1-beta.1.md",
+    "assets": [
+      {
+        "name": "Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip",
+        "sha256": "368b8c7a13e1d3ac27914ba3fba9c6822fa96ef01fd9cfc82579260d77464401"
+      },
+      {
+        "name": "Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip",
+        "sha256": "4858c3dd5c3e58989808fe4f38ddf9fb28155449dc52e376713e11c2f2693e6d"
+      }
+    ]
+  },
+  {
+    "tag": "v0.3.0",
+    "title": "0.3.0 · 稳定版",
+    "target": "631de53283d679920c247bdd1b413380501abdb3",
+    "prerelease": false,
+    "latest": true,
+    "notes": "releases/v0.3.0.md",
+    "assets": [
+      {
+        "name": "Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
+        "sha256": "e26c765e83d5a188aa84899a7d17154f13346926e95c4d0263bb64174cf5c423"
+      },
+      {
+        "name": "Bongo-Clawd-0.3.0-Windows-x64.zip",
+        "sha256": "c94941a590b1d2f3734a9af1a96467ab1cf414144044fa9b30a84c4bdbc7b6c3"
+      }
+    ]
+  }
+]
