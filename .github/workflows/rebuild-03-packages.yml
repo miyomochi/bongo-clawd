@@ -1,0 +1,64 @@
+name: Rebuild stable and experimental packages
+on:
+  push:
+    branches: ['publish/rebuild-03-20261021']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    name: ${{ matrix.channel }} ${{ matrix.version }}
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - channel: stable
+            version: 0.3.0
+            source: ea171f79e6640593aff4f1c0f68cd3e2c0ff7df4
+          - channel: beta
+            version: 0.3.1-beta
+            source: e8105c0a01cd13086ef382666289f9006b5d223f
+    env:
+      PYTHONUTF8: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.source }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Confirm edition and shared repairs
+        shell: pwsh
+        run: |
+          python scripts/verify-edition.py ${{ matrix.channel }}
+          if ($LASTEXITCODE -ne 0) { throw 'Edition verification failed' }
+          python scripts/verify-assets.py
+          if ($LASTEXITCODE -ne 0) { throw 'Asset verification failed' }
+      - name: Confirm beta version naming
+        if: matrix.channel == 'beta'
+        shell: pwsh
+        run: |
+          cargo test --manifest-path core-tests/Cargo.toml --locked beta_updates_require_opted_in_beta_installation
+          if ($LASTEXITCODE -ne 0) { throw 'Beta name check failed' }
+      - name: Build portable package
+        shell: pwsh
+        run: ./scripts/build-windows.ps1
+      - name: Build installer and checksums
+        shell: pwsh
+        run: |
+          choco install nsis --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'NSIS installation failed' }
+          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          ./scripts/build-installer.ps1 -PackageDirectory "dist/Bongo-Clawd-$version-Windows-x64" -Version $version -MakeNSIS "${env:ProgramFiles(x86)}/NSIS/makensis.exe"
+          Compress-Archive -Path "dist/Bongo-Clawd-$version-Windows-x64-Setup.exe" -DestinationPath "dist/Bongo-Clawd-$version-Windows-x64-Setup.zip" -Force
+          Get-ChildItem dist/*.zip | ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bongo-Clawd-${{ matrix.channel }}-${{ matrix.version }}
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+            EDITION.json
+          if-no-files-found: error
+          retention-days: 30
