@@ -27,7 +27,7 @@
  listen(scene,'pointermove',e=>{
   if(gesture&&gesture.id===e.pointerId){
    const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;
-   if(!gesture.dragging&&Math.hypot(dx,dy)>6){gesture.dragging=true;c.cancelReaction();hint.textContent='正在拖动工位';}
+   if(!gesture.dragging&&Math.hypot(dx,dy)>6){gesture.dragging=true;hint.textContent='正在拖动工位';}
    if(gesture.dragging)setOffset(gesture.base.x+dx,gesture.base.y+dy);
    return;
   }
@@ -55,7 +55,7 @@
  listen(menu.querySelector('[data-menu-home]'),'click',()=>{setOffset(0,0);closeMenu();});
  listen(document,'pointerdown',e=>{if(!e.target.closest?.('[data-context-menu]'))closeMenu();});
  listen(window,'keydown',e=>{
-  if(e.code==='Escape'){closeMenu();c.cancelReaction();}
+  if(e.code==='Escape')closeMenu();
   c.press(e.code,{repeat:e.repeat});
   if(e.target!==textarea&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
  });

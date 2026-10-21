@@ -1,0 +1,44 @@
+name: Replace existing 0.3 release packages
+on:
+  push:
+    branches: ['publish/replace-03-assets-20261021']
+    paths:
+      - '.github/workflows/replace-03-assets.yml'
+      - 'scripts/replace-existing-releases.py'
+      - 'scripts/stage-repaired-artifacts.py'
+      - 'releases/repair-2026-10-21.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: replace-existing-03-releases
+  cancel-in-progress: false
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPAIR_ARTIFACTS: ${{ runner.temp }}/repair-artifacts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: publish/replace-03-assets-20261021
+          fetch-depth: 0
+      - name: Retrieve separately built stable and beta packages
+        run: |
+          gh run download 39576781585 --repo "$GITHUB_REPOSITORY" --name Bongo-Clawd-stable-0.3.0 --dir "$REPAIR_ARTIFACTS/stable"
+          gh run download 39576781585 --repo "$GITHUB_REPOSITORY" --name Bongo-Clawd-beta-0.3.1-beta --dir "$REPAIR_ARTIFACTS/beta"
+          python scripts/stage-repaired-artifacts.py
+      - name: Validate channels and replace existing mutable release assets
+        run: python scripts/replace-existing-releases.py --publish
+      - name: Save reviewed binary bytes on the publication branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f downloads/Bongo-Clawd-0.3.0-Windows-x64.zip downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip downloads/Bongo-Clawd-0.3.1-beta-Windows-x64.zip downloads/Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip downloads/Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip
+          if ! git diff --cached --quiet; then
+            git commit -m 'release: store repaired stable and beta packages [skip ci]'
+            git push origin HEAD:publish/replace-03-assets-20261021
+          fi

@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-21",
+  "authorization": "维护者确认分别修复并覆盖既有稳定版与试验版，不递增功能版本。",
+  "workflow_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39576781585",
+  "scope": [
+    "修复 SVG 身体点击命中",
+    "戳一戳播放完整，普通键鼠输入不打断；原生统计继续",
+    "临时背景图标",
+    "Beta 简化版本名；检查器接受无数字尾缀 beta"
+  ],
+  "checks": [
+    "两版分别通过针对性的互动播放检查与资源检查",
+    "两版独立 Windows MSVC/NSIS 构建",
+    "Beta 仅运行 beta 通道选择针对性 Rust 测试",
+    "ZIP CRC、x64 PE、包内版本、内外 SHA256、EDITION 源提交、两边共享资源一致且 EXE 不同"
+  ],
+  "limitations": [
+    "本轮最终包未在用户 Windows 触摸板上完成验收",
+    "Beta 下载/安装/重启自动更新全过程仍待实机验证"
+  ],
+  "editions": {
+    "stable": {
+      "edition": "stable",
+      "version": "0.3.0",
+      "source_commit": "ea171f79e6640593aff4f1c0f68cd3e2c0ff7df4",
+      "automatic_updates_experimental": false,
+      "native_statistics_unchanged": true,
+      "shared_asset_sha256": {
+        "web/desktop.css": "32993ee686ab475446823812e70dc180310a2c322d5f2f62cea8916ae7977515",
+        "web/core/clawd-reactions.js": "409dd1d79baf7b808fc1fceb8b8095fb7b14b75713e6eb887f87b4b21b5ed48f",
+        "src-tauri/icons/icon.svg": "e689cc2dd2635c24f957627aa0d4f5b8faca94d09c45b952c9ef3d6377652261",
+        "src-tauri/icons/icon.png": "c1d73fa4060232cd1f6887cadd97d725b1cdb19f2f10ba2ea2cdc228e59eccf9",
+        "src-tauri/icons/icon.ico": "a2863bdd69a619074c508a368e6abfbe83ca33774fd2e9a342aa0f185ec51489"
+      }
+    },
+    "beta": {
+      "edition": "beta",
+      "version": "0.3.1-beta",
+      "source_commit": "e8105c0a01cd13086ef382666289f9006b5d223f",
+      "automatic_updates_experimental": true,
+      "native_statistics_unchanged": true,
+      "shared_asset_sha256": {
+        "web/desktop.css": "32993ee686ab475446823812e70dc180310a2c322d5f2f62cea8916ae7977515",
+        "web/core/clawd-reactions.js": "409dd1d79baf7b808fc1fceb8b8095fb7b14b75713e6eb887f87b4b21b5ed48f",
+        "src-tauri/icons/icon.svg": "e689cc2dd2635c24f957627aa0d4f5b8faca94d09c45b952c9ef3d6377652261",
+        "src-tauri/icons/icon.png": "c1d73fa4060232cd1f6887cadd97d725b1cdb19f2f10ba2ea2cdc228e59eccf9",
+        "src-tauri/icons/icon.ico": "a2863bdd69a619074c508a368e6abfbe83ca33774fd2e9a342aa0f185ec51489"
+      }
+    }
+  },
+  "executable_sha256": {
+    "stable": "d39cd5d37a91b5f68a46f430194ec09f2c624207bdb6af5bea6a80b8c73e48fc",
+    "beta": "eb38f324d507ae2e551ccc70706e9620d2828cd46fd296079361ad13fdce5cb0"
+  },
+  "releases": [
+    {
+      "edition": "stable",
+      "release_id": 419068895,
+      "old_tag": "v0.3.0",
+      "tag": "v0.3.0",
+      "old_source": "631de53283d679920c247bdd1b413380501abdb3",
+      "source": "ea171f79e6640593aff4f1c0f68cd3e2c0ff7df4",
+      "old_assets": [
+        {
+          "name": "Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
+          "sha256": "e26c765e83d5a188aa84899a7d17154f13346926e95c4d0263bb64174cf5c423"
+        },
+        {
+          "name": "Bongo-Clawd-0.3.0-Windows-x64.zip",
+          "sha256": "c94941a590b1d2f3734a9af1a96467ab1cf414144044fa9b30a84c4bdbc7b6c3"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "sha256": "3dbcacbdf6314e8e57a12d478a98ffaf4459d81fc138de270d8b2dd01abbab58"
+        }
+      ],
+      "new_assets": [
+        {
+          "name": "Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
+          "path": "downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
+          "sha256": "9659ce49da4a17ee2d4c549ec4a092382a06c6198ab29f872a3401da9846c568"
+        },
+        {
+          "name": "Bongo-Clawd-0.3.0-Windows-x64.zip",
+          "path": "downloads/Bongo-Clawd-0.3.0-Windows-x64.zip",
+          "sha256": "d3cfe61d6625ea08925c7a49549a987565c32698e091e32a7df7f452a3c5df72"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "path": "releases/checksums/0.3.0/SHA256SUMS.txt",
+          "sha256": "391a3cec04436def45698b7f29a8d26ea8fbeef1e04df6ba38955d8f5a7ebb05"
+        }
+      ]
+    },
+    {
+      "edition": "beta",
+      "release_id": 419068856,
+      "old_tag": "v0.3.1-beta.1",
+      "tag": "v0.3.1-beta",
+      "old_source": "e17be70268b668295d829bc8561bef6f60a7ed28",
+      "source": "e8105c0a01cd13086ef382666289f9006b5d223f",
+      "old_assets": [
+        {
+          "name": "Bongo-Clawd-0.3.1-beta.1-Windows-x64-Setup.zip",
+          "sha256": "368b8c7a13e1d3ac27914ba3fba9c6822fa96ef01fd9cfc82579260d77464401"
+        },
+        {
+          "name": "Bongo-Clawd-0.3.1-beta.1-Windows-x64.zip",
+          "sha256": "4858c3dd5c3e58989808fe4f38ddf9fb28155449dc52e376713e11c2f2693e6d"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "sha256": "56148c0523ae0e3173d780d5115e0a8e4ff2c95365c671fa3e692c1a8e94d9ed"
+        }
+      ],
+      "new_assets": [
+        {
+          "name": "Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip",
+          "path": "downloads/Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip",
+          "sha256": "40c65b57afcfd514de2eae1b677906efa602efd2d2d739ddd11867cc4ba25759"
+        },
+        {
+          "name": "Bongo-Clawd-0.3.1-beta-Windows-x64.zip",
+          "path": "downloads/Bongo-Clawd-0.3.1-beta-Windows-x64.zip",
+          "sha256": "6fbc75e2a5daab1a92c913e2197a29f3dc51596d3b516a5124a3f551ae696124"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "path": "releases/checksums/0.3.1-beta/SHA256SUMS.txt",
+          "sha256": "9b5787e8cae1c57a93cfb13dc3ff07ae50f3b0a81192a1138ac5b5da92b02fa2"
+        }
+      ]
+    }
+  ]
+}

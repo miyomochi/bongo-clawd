@@ -16,7 +16,7 @@ pe = struct.unpack_from('<I', exe, 0x3c)[0]
 assert exe[:2] == b'MZ' and exe[pe:pe+4] == b'PE\0\0'
 assert struct.unpack_from('<H', exe, pe+4)[0] == 0x8664
 out = root/'dist'
-version = '0.3.0'
+version = json.loads((root/'src-tauri/tauri.conf.json').read_text())['version']
 package = out/f'Bongo-Clawd-{version}-Windows-x64'
 package.mkdir(parents=True, exist_ok=True)
 (package/'Bongo-Clawd.exe').write_bytes(exe)
@@ -24,7 +24,7 @@ for name in ['README-FIRST.txt', 'COMPARISON.md', 'VALIDATION.md', 'THIRD-PARTY-
     shutil.copyfile(root/name, package/name)
 shutil.copytree(root/'rust-licenses', package/'rust-licenses', dirs_exist_ok=True)
 metadata = {
-    'version': '0.3.0', 'exe_bytes': len(exe),
+    'version': version, 'exe_bytes': len(exe),
     'exe_sha256': hashlib.sha256(exe).hexdigest(),
     'runtime_bundled': False, 'runtime': 'System Microsoft Edge WebView2',
     'windows_runtime_tested': json.loads((root/'VALIDATION-RESULTS.json').read_text()).get('checks', {}).get('windows_runtime') == 'user_reported_passed',

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-21",
+  "version": "0.3.1-beta",
+  "channel": "beta",
+  "source_commit": "e8105c0a01cd13086ef382666289f9006b5d223f",
+  "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39576781585",
+  "checks": [
+    "两版分别通过针对性的互动播放检查与资源检查",
+    "两版独立 Windows MSVC/NSIS 构建",
+    "Beta 仅运行 beta 通道选择针对性 Rust 测试",
+    "ZIP CRC、x64 PE、包内版本、内外 SHA256、EDITION 源提交、两边共享资源一致且 EXE 不同"
+  ],
+  "limitations": [
+    "本轮最终包未在用户 Windows 触摸板上完成验收",
+    "Beta 下载/安装/重启自动更新全过程仍待实机验证"
+  ],
+  "baseline_verification": {
+    "date": "2026-10-20",
+    "version": "0.3.1-beta.1",
+    "channel": "beta",
+    "source_commit": "e17be70268b668295d829bc8561bef6f60a7ed28",
+    "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39447043102",
+    "checks": {
+      "node": 98,
+      "rust_core": 21,
+      "candidate_assets": 34,
+      "icon_assets": 3,
+      "windows_msvc_release": "passed",
+      "nsis": "passed",
+      "windows_powershell_exact_extraction": "sha256 matched",
+      "unknown_installer_entry": "rejected",
+      "runtime_zip_hash_crc": "passed",
+      "portable_exe": "Windows x64 PE verified",
+      "real_windows_desktop_update_install_restart": "not yet tested"
+    }
+  }
+}

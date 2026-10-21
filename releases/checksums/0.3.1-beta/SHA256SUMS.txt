@@ -1,0 +1,2 @@
+40c65b57afcfd514de2eae1b677906efa602efd2d2d739ddd11867cc4ba25759  Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip
+6fbc75e2a5daab1a92c913e2197a29f3dc51596d3b516a5124a3f551ae696124  Bongo-Clawd-0.3.1-beta-Windows-x64.zip
