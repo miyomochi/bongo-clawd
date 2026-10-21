@@ -9,9 +9,10 @@ try {
     $package = Join-Path $dist "Bongo-Clawd-$version-Windows-x64"
     New-Item -ItemType Directory -Force $package | Out-Null
     Copy-Item 'src-tauri/target/x86_64-pc-windows-msvc/release/bongo-clawd-lite.exe' (Join-Path $package 'Bongo-Clawd.exe') -Force
-    foreach ($name in @('README-FIRST.txt', 'COMPARISON.md', 'VALIDATION.md', 'THIRD-PARTY-NOTICES.md', 'LICENSE-CODE.txt', 'VALIDATION-RESULTS.json', 'EDITION.json')) {
+    foreach ($name in @('README-FIRST.txt', 'COMPARISON.md', 'VALIDATION.md', 'THIRD-PARTY-NOTICES.md', 'LICENSE-CODE.txt', 'VALIDATION-RESULTS.json')) {
         Copy-Item $name $package -Force
     }
+    if (Test-Path 'EDITION.json') { Copy-Item 'EDITION.json' $package -Force }
     Copy-Item 'rust-licenses' $package -Recurse -Force
     $exe = Join-Path $package 'Bongo-Clawd.exe'
     $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
