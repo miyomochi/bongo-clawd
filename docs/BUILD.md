@@ -50,3 +50,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-installer.ps
 默认输出 `dist/Bongo-Clawd-0.2.1-Windows-x64-Setup.exe`。如果 NSIS 不在 PATH，用 `-MakeNSIS` 指定 `makensis.exe` 的完整路径。
 
 安装仅针对当前用户，可选择有写入权限的安装目录，默认创建桌面快捷方式，同时提供开始菜单及卸载入口。卸载保留个人设置。更换已有安装的盘符时，先退出小蟹并卸载旧安装，再安装到新目录。
+
+戳一戳的浏览器命中回归：设置 PLAYWRIGHT_CHROMIUM_EXECUTABLE 后运行 `node tests/desktop-pointer.browser.cjs`（需要 playwright-core）。Windows packages 工作流直接使用已安装的 Edge；它验证桌面实际 HTML/CSS 的坐标点击，不替代真实触摸板设备验收。

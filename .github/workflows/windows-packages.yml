@@ -1,7 +1,7 @@
 name: Windows packages
 on:
   push:
-    branches: ['release/stable-*', 'release/beta-*']
+    branches: ['release/stable-*', 'release/beta-*', 'release/candidate-*']
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,6 +23,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Frontend checks failed' }
           python scripts/verify-assets.py
           if ($LASTEXITCODE -ne 0) { throw 'Asset checks failed' }
+      - name: Desktop pointer checks in Edge
+        shell: pwsh
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright-core@1.56.1
+          if ($LASTEXITCODE -ne 0) { throw 'Browser test dependency installation failed' }
+          $env:PLAYWRIGHT_CHROMIUM_EXECUTABLE = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
+          node tests/desktop-pointer.browser.cjs
+          if ($LASTEXITCODE -ne 0) { throw 'Desktop pointer checks failed' }
       - name: Rust core checks
         shell: pwsh
         run: |
