@@ -103,6 +103,7 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 - [构建与项目结构](docs/BUILD.md)
 - [验证记录](VALIDATION.md)
 - [版本记录](CHANGELOG.md)
+- [发布与历史版本维护](docs/RELEASES.md)
 - [资源占用的比较口径](COMPARISON.md)
 
 ## 致谢与许可
