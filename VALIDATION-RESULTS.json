@@ -1,18 +1,34 @@
 {
-  "date": "2026-10-20",
+  "date": "2026-10-21",
   "version": "0.3.0",
   "channel": "stable",
   "checks": {
-    "node_animation_and_desktop": 94,
-    "rust_core": 19,
+    "click_playthrough_targeted": 2,
+    "edition_separation": "verified; updater only in beta",
+    "native_statistics": "unchanged",
     "candidate_assets": 29,
     "icon_assets": 3,
-    "windows_x64_build": "passed Windows MSVC release",
-    "installer": "NSIS compiled with explicit UTF-8; ZIP hash, CRC, and expected single entry verified",
-    "portable": "ZIP hash and CRC verified; EXE Windows x64 PE verified",
-    "windows_runtime": "not_run_for_0.3.0"
+    "windows_x64_build": "see Windows repair workflow result",
+    "installer": "see Windows repair workflow result",
+    "windows_runtime": "final rebuilt package not independently device-tested"
   },
-  "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39443645265",
-  "source_commit": "229d9b36650f1cf793c95e66a36281a214ff2693",
-  "note": "0.2.1 runtime approval does not apply to 0.3.0."
+  "baseline_verification": {
+    "date": "2026-10-20",
+    "version": "0.3.0",
+    "channel": "stable",
+    "checks": {
+      "node_animation_and_desktop": 94,
+      "rust_core": 19,
+      "candidate_assets": 29,
+      "icon_assets": 3,
+      "windows_x64_build": "passed Windows MSVC release",
+      "installer": "NSIS compiled with explicit UTF-8; ZIP hash, CRC, and expected single entry verified",
+      "portable": "ZIP hash and CRC verified; EXE Windows x64 PE verified",
+      "windows_runtime": "not_run_for_0.3.0"
+    },
+    "ci_run": "https://github.com/miyomochi/bongo-clawd/actions/runs/39443645265",
+    "source_commit": "229d9b36650f1cf793c95e66a36281a214ff2693",
+    "note": "0.2.1 runtime approval does not apply to 0.3.0."
+  },
+  "note": "This repair runs only relevant checks per user request; prior full-suite results belong to the baseline. No claim of complete Windows update/install/restart device verification."
 }
