@@ -1,6 +1,6 @@
 {
-  "version": "0.3.1-beta",
-  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip",
-  "sha256": "40c65b57afcfd514de2eae1b677906efa602efd2d2d739ddd11867cc4ba25759",
-  "notes": "修复了戳一戳不响应问题，添加了新的临时图标。不稳定的 Beta 更新功能试验。包含稳定版 0.3.0 的手臂方向感和四种戳一戳；新增每日首次启动检查（默认关闭）、新版日志、今日不再提示、下载进度和 SHA256 校验，由 Windows 安装向导完成更新。检查时蓝色浮屏敲键盘，发现新版举灯泡，成功挥魔法棒；失败会晕晕并显示放大的红色 ERROR，关闭提示后恢复正常。更新安装与重启全过程仍待真实 Windows 桌面验证。"
+  "version": "0.4.0-beta",
+  "download_url": "https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0-beta/Bongo-Clawd-0.4.0-beta-Windows-x64-Setup.zip",
+  "sha256": "60e139c5ca6b323a5063f719374f2fb4e77883e30434882b1e4693795cd89895",
+  "notes": "新增衣柜翻页、牛仔帽玫瑰玩具枪、侦探帽放大镜、待机摸鱼、吹泡泡和魔法变身彩蛋；补齐普通键鼠及快速敲击衔接。继承上一Beta的自动检查更新、下载校验和安装向导升级机制。仍为试验版，等待Windows实机更新及新功能验收。"
 }
