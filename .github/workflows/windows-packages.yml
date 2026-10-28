@@ -4,7 +4,7 @@ on:
     branches: ['release/stable-*', 'release/beta-*']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   package:
     runs-on: windows-latest
@@ -20,6 +20,7 @@ jobs:
           python scripts/build-reach-preview.py
           python scripts/build-click-preview.py
           if (Test-Path scripts/build-update-preview.py) { python scripts/build-update-preview.py }
+          python scripts/build-accessory-carousel-preview.py
           node --test tests/*.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Frontend checks failed' }
           python scripts/verify-assets.py
@@ -30,6 +31,9 @@ jobs:
           rustup show
           cargo test --manifest-path core-tests/Cargo.toml --locked
           if ($LASTEXITCODE -ne 0) { throw 'Core checks failed' }
+      - name: Verify beta provenance
+        if: startsWith(github.ref_name, 'release/beta-')
+        run: python scripts/verify-edition.py beta
       - name: Build portable package
         shell: pwsh
         run: ./scripts/build-windows.ps1
@@ -54,3 +58,9 @@ jobs:
             dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish 0.4.0 beta and update beta feed
+        if: github.ref_name == 'release/beta-0.4.0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/publish-next-beta.py

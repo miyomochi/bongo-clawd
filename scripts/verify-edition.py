@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,hashlib,json,re,subprocess
 p=argparse.ArgumentParser();p.add_argument('edition',choices=['stable','beta']);a=p.parse_args()
 root=Path(__file__).resolve().parents[1];read=lambda n:(root/n).read_text(encoding='utf-8')
-version={'stable':'0.3.0','beta':'0.3.1-beta'}[a.edition]
+version={'stable':'0.3.0','beta':'0.4.0-beta'}[a.edition]
 assert json.loads(read('src-tauri/tauri.conf.json'))['version']==version
 assert re.search(r'^version = "'+re.escape(version)+'"$',read('src-tauri/Cargo.toml'),re.M)
 assert 'name = "bongo-clawd-lite"\nversion = "'+version+'"' in read('src-tauri/Cargo.lock')

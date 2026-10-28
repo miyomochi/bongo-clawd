@@ -19,22 +19,25 @@
     }
 
     function refreshEyes() {
+      if(ctx.gamingOwnsHands?.())return;
       const surge = ctx.level > 0 && performance.now() < ctx.surgeUntil;
       const recovering = performance.now() < ctx.recoveryUntil;
       const entering = ctx.level > 0 && performance.now() < ctx.enteringUntil;
       const sleeping = ctx.sleepPhase!=='awake';
       const waking=ctx.wakePhase!=='none';
+      const bubbles=ctx.bubblesPhase&&ctx.bubblesPhase!=='none'&&(!ctx.bubbleHurrying||ctx.bubbleAlarm);
+      const magic=ctx.magicPhase&&ctx.magicPhase!=='none'&&!ctx.magicHurrying;
       const happy=ctx.happyOwnsEyes?.()&&!ctx.level&&!recovering&&!entering;
-      const selected = ctx.accessoryPreview ? ctx.headphoneEyes : waking ? (ctx.wakePhase==='startled' ? ctx.startledEyes : ctx.wakePhase==='checking' ? ctx.sneakEyes : ctx.wakePhase==='pretending' ? ctx.busyEyes : ctx.blinkEyes) : sleeping ? ctx.blinkEyes : ctx.looking ? (ctx.squint ? ctx.sneakEyes : ctx.openEyes) : (recovering || entering) ? ctx.blinkEyes : surge ? ctx.wideEyes : ctx.level ? ctx.busyEyes : happy ? ctx.happyEyes : ctx.blinking ? ctx.blinkEyes : ctx.openEyes;
-      [ctx.openEyes, ctx.blinkEyes, ctx.busyEyes, ctx.wideEyes, ctx.sneakEyes, ctx.startledEyes,ctx.happyEyes,ctx.headphoneEyes].filter(Boolean).forEach(el => el.setAttribute('display', el === selected ? 'inline' : 'none'));
+      const selected = ctx.accessoryPreview ? ctx.headphoneEyes : waking ? (ctx.wakePhase==='startled' ? ctx.startledEyes : ctx.wakePhase==='checking' ? ctx.sneakEyes : ctx.wakePhase==='pretending' ? ctx.busyEyes : ctx.blinkEyes) : sleeping ? ctx.blinkEyes : magic ? ctx.magicEyes : bubbles ? (ctx.bubbleAlarm?ctx.bubbleHurryEyes:ctx.bubbleSmile?ctx.happyEyes:ctx.blinking?ctx.blinkEyes:ctx.openEyes) : ctx.looking ? (ctx.squint ? ctx.sneakEyes : ctx.openEyes) : (recovering || entering) ? ctx.blinkEyes : surge ? ctx.wideEyes : ctx.level ? ctx.busyEyes : happy ? ctx.happyEyes : ctx.blinking ? ctx.blinkEyes : ctx.openEyes;
+      [ctx.openEyes, ctx.blinkEyes, ctx.busyEyes, ctx.wideEyes, ctx.sneakEyes, ctx.startledEyes,ctx.happyEyes,ctx.headphoneEyes,ctx.magicEyes,ctx.bubbleHurryEyes].filter(Boolean).forEach(el => el.setAttribute('display', el === selected ? 'inline' : 'none'));
       [ctx.openEyes,ctx.sneakEyes].forEach(el=>el.setAttribute('transform', `translate(${ctx.reduceMotion ? 0 : (waking ? ctx.wakeEyeX : ctx.eyeX)} ${ctx.reduceMotion ? 0 : (waking ? 0 : ctx.eyeY+(ctx.coolEyeY||0))})`));
-      ctx.root.dataset.expression = ctx.accessoryPreview ? (ctx.accessoryExpression||'headphones') : waking ? ctx.wakePhase : sleeping ? 'sleeping' : ctx.looking ? (ctx.squint ? 'sneak' : 'looking') : recovering ? 'recovering' : entering ? 'entering' : surge ? 'wide' : ctx.level ? 'busy' : happy ? 'happy' : ctx.blinking ? 'blink' : 'open';
+      ctx.root.dataset.expression = ctx.accessoryPreview ? (ctx.accessoryExpression||'headphones') : waking ? ctx.wakePhase : sleeping ? 'sleeping' : magic ? 'magic' : bubbles ? (ctx.bubbleAlarm?'bubble-hurry':'bubbles') : ctx.looking ? (ctx.squint ? 'sneak' : 'looking') : recovering ? 'recovering' : entering ? 'entering' : surge ? 'wide' : ctx.level ? 'busy' : happy ? 'happy' : ctx.blinking ? 'blink' : 'open';
     }
 
     let restTimer=null,restStart=null;
     function stopBreathing(){clearTimeout(restTimer);restTimer=null;restStart=null;}
     function restingBreath(now){
-      if(!ctx.breathingEnabled||ctx.reduceMotion||ctx.disposed||ctx.clearing||document.hidden||ctx.isAdjusting?.()){
+      if(!ctx.breathingEnabled||ctx.reduceMotion||ctx.disposed||ctx.clearing||document.hidden||ctx.isAdjusting?.()||(ctx.bubblesPhase&&ctx.bubblesPhase!=='none')||(ctx.magicPhase&&ctx.magicPhase!=='none')){
         stopBreathing();return 0;
       }
       const free=ctx.sleepPhase==='awake'&&ctx.wakePhase==='none'&&!ctx.held.size&&!ctx.mouseMode&&!ctx.level&&!ctx.looking&&now>=ctx.recoveryUntil&&now-ctx.lastStroke>350&&(!ctx.coolPhase||['none','wearing'].includes(ctx.coolPhase));
@@ -44,6 +47,7 @@
       return -Math.round((.5-.5*Math.cos((now-restStart)*Math.PI*2/4200))*1000)/1000;
     }
     function renderBody() {
+      if(ctx.gamingOwnsHands?.())return;
       const surge = ctx.level > 0 && performance.now() < ctx.surgeUntil;
       const now = performance.now();
       const breathing = now < ctx.recoveryUntil && now-ctx.lastStroke > 220 && !ctx.held.size;
@@ -78,6 +82,7 @@
       ctx.body.setAttribute('transform',bodyTransform);
       ctx.hands.setAttribute('transform',`translate(${handsX} ${handsY})`);
       ctx.anchorHappy?.(bodyX,bodyY);
+      ctx.anchorBubbles?.(handsX,handsY);
       const occlusion=ctx.accessoryPreview?bodyTransform:`translate(${bodyX-handsX} ${bodyY-handsY})`;
       ctx.armClip.setAttribute('transform',occlusion);
       ctx.raisedClip.setAttribute('transform',occlusion);
@@ -91,9 +96,12 @@
       if(wakeButton)wakeButton.disabled=ctx.sleepPhase!=='asleep';
       if(ctx.paused){ctx.setStatus('已暂停','paused');return;}
       if(ctx.isAdjusting?.()){ctx.setStatus('试穿中','accessory');return;}
+      if(ctx.gamingOwnsHands?.()){ctx.setStatus(ctx.gamingCaption||'摸鱼中','gaming');return;}
       if(ctx.wakePhase!=='none')ctx.setStatus(ctx.wakePhase==='startled' ? '哇！' : ctx.wakePhase==='checking' ? '谁、谁来了？' : ctx.wakePhase==='pretending' ? '我没睡！在敲呢！' : '呼……继续工作', 'waking');
       else if (ctx.sleepPhase==='asleep') ctx.setStatus(ctx.happyPhase==='dreaming'?'睡着了':'呼……Zzz', 'asleep');
       else if(ctx.sleepPhase!=='awake')ctx.setStatus('困困的……', 'sleepy');
+      else if(ctx.magicPhase&&ctx.magicPhase!=='none'&&!ctx.magicHurrying)ctx.setStatus('变个小魔术','magic');
+      else if(ctx.bubblesPhase&&ctx.bubblesPhase!=='none'&&!ctx.bubbleHurrying)ctx.setStatus('泡泡飘起来了','bubbles');
       else if(ctx.coolPhase&&ctx.coolPhase!=='none')ctx.setStatus(({fetching:'偷偷戴上',lifting:'戴墨镜',adjusting:'戴好了',wearing:'全工位最酷的小蟹',leaving:'耍帅结束，继续工作'})[ctx.coolPhase], 'cool');
       else if (ctx.looking) ctx.setStatus(ctx.lookCaption||'嗯？没人吧……', 'looking');
       else if (ctx.mouseMode) ctx.setStatus(ctx.root.dataset.left!=='idle' ? '打字和鼠标' : '移动鼠标', 'mouse');
@@ -168,7 +176,9 @@
     }
 
     function tapHand(hand) {
-      if(hand==='left'&&ctx.coolOwnsLeft?.())return;
+      if(ctx.gamingOwnsHands?.())return;
+      if(ctx.magicOwnsHands?.())return;
+      if(hand==='left'&&(ctx.coolOwnsLeft?.()||ctx.bubblesOwnsLeft?.()))return;
       ctx.cancelHand(hand);
       ctx.pose(hand, ctx.reduceMotion ? 'down' : 'up');
       if (!ctx.reduceMotion) ctx.handTimers[hand].push(setTimeout(()=>ctx.pose(hand,'down'),ctx.level || ctx.wakePhase==='pretending' ? 25 : 40));

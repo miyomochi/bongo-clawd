@@ -67,7 +67,7 @@ impl Preferences {
         self.sleep_seconds = self.sleep_seconds.clamp(30, 3600);
         if !matches!(
             self.accessory.as_str(),
-            "none" | "headphones" | "cat-headphones" | "sprout" | "duck"
+            "none" | "headphones" | "cat-headphones" | "sprout" | "duck" | "cowboy-hat" | "detective-hat"
         ) {
             self.accessory = "none".into();
         }
@@ -105,7 +105,7 @@ impl Preferences {
         if let Some(value) = patch.get("accessory").and_then(Value::as_str) {
             if matches!(
                 value,
-                "none" | "headphones" | "cat-headphones" | "sprout" | "duck"
+                "none" | "headphones" | "cat-headphones" | "sprout" | "duck" | "cowboy-hat" | "detective-hat"
             ) {
                 self.accessory = value.into();
             }
@@ -164,6 +164,16 @@ mod tests {
         p.accessory = "unknown".into();
         p.sanitize();
         assert_eq!(p.accessory, "none");
+    }
+    #[test]
+    fn cowboy_hat_placeholder_can_be_saved() {
+        let mut p = Preferences::default();
+        p.patch(&serde_json::json!({"accessory":"cowboy-hat"}));
+        assert_eq!(p.accessory, "cowboy-hat");
+        p.sanitize();
+        assert_eq!(p.accessory, "cowboy-hat");
+        p.patch(&serde_json::json!({"accessory":"invalid"}));
+        assert_eq!(p.accessory, "cowboy-hat");
     }
     #[test]
     fn optional_counters_and_breathing_migrate_without_saving_counts() {

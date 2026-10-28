@@ -4,7 +4,7 @@
   function createClawdController(root, rig, options={}) {
     const svg = root.querySelector('#clawd-scene');
     const ctx = {
-      root, rig, svg,paused:false,breathingEnabled:options.breathingEnabled===true,accessoryStorage:options.accessoryStorage!==false,coolEnabled:options.sunglassesEnabled===true,happyEnabled:options.happyEnabled===true,
+      root, rig, svg,paused:false,breathingEnabled:options.breathingEnabled===true,accessoryStorage:options.accessoryStorage!==false,coolEnabled:options.sunglassesEnabled===true,happyEnabled:options.happyEnabled===true,bubblesEnabled:options.bubblesEnabled===true,magicEnabled:options.magicEnabled===true,gamingEnabled:options.gamingEnabled===true,idleChoice:null,
       sleepEnabled:options.sleepEnabled!==false,sleepDelayMs:90000,idleSince:performance.now(),
       onAccessoryConfirmed:typeof options.onAccessoryConfirmed==='function'?options.onAccessoryConfirmed:null,
       zone:root.querySelector('[data-mouse-zone]'),
@@ -34,13 +34,13 @@
       startledEyes:'eyes-startled',wakeBubble:'wake-bubble',sneakEyes:'eyes-sneak',sweat:'sweat-particles',sleepSymbols:'sleep-symbols',armClip:'far-arm-visible',raisedClip:'raised-arms-visible'
     };
     for (const [name,id] of Object.entries(nodes)) ctx[name]=svg.querySelector('#'+id);
-    for (const name of ['renderer','behavior','sleep','wake','input','demo','cool','happy','eggs','headphones']) {
+    for (const name of ['renderer','behavior','sleep','wake','input','demo','cool','happy','bubbles','magic','gaming','eggs','headphones']) {
       if (!global.ClawdModules?.[name]) throw new Error('Missing Clawd module: '+name);
       Object.assign(ctx,global.ClawdModules[name](ctx));
     }
     function clearAll(options={}) {
       ctx.clearing=true;ctx.stopBreathing();
-      ctx.stopAccessoryPreview?.(false);
+      ctx.stopGaming(false);ctx.stopMagic(false);ctx.stopBubbles(false);ctx.stopAccessoryPreview?.(false);
       ctx.stopEggTimer();ctx.stopHappy(false);
       if(!options.preserveSunglasses)ctx.stopCool(false);
       clearTimeout(ctx.idleTimer);ctx.stopWake();ctx.stopSleep();ctx.stopLook();
@@ -80,7 +80,7 @@
       }
       ctx.refreshStatus();
     }
-    for(const name of ['startCool','startHappy','startDream','startLook','startSleep','startWake']){
+    for(const name of ['startCool','startHappy','startDream','startLook','startSleep','startWake','startBubbles','startMagic','startGaming']){
       const fn=ctx[name];ctx[name]=(...args)=>ctx.isAdjusting()?false:fn(...args);
     }
     configure(options);
@@ -92,9 +92,9 @@
     return {
       press:ctx.press, release:ctx.release, tap:ctx.tap, moveMouse:ctx.moveMouse,mouseButton:ctx.mouseButton,stopMouse:ctx.stopMouse,
       openAccessoryMenu:ctx.openAccessoryMenu,selectAccessory:ctx.selectAccessory,closeAccessoryMenu:ctx.closeAccessoryMenu,restoreAccessory:ctx.restoreAccessory,setPaused,
-      clearAll,configure,resumeIdle:()=>{ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();ctx.renderBody();}, showSunglasses:ctx.startCool,showHappy:ctx.startHappy,showDream:ctx.startDream, lookAround:ctx.startLook, sleep:ctx.startSleep, wake:ctx.startWake,
+      clearAll,configure,resumeIdle:()=>{ctx.idleSince=performance.now();ctx.lookCount=0;ctx.queueLook();ctx.queueEgg();ctx.renderBody();}, showSunglasses:ctx.startCool,showHappy:ctx.startHappy,showDream:ctx.startDream,showBubbles:ctx.startBubbles,showMagic:ctx.startMagic,showGaming:ctx.startGaming, lookAround:ctx.startLook, sleep:ctx.startSleep, wake:ctx.startWake,
       getState:()=>({
-        paused:ctx.paused,breathingEnabled:ctx.breathingEnabled,accessory:ctx.accessoryState(),happy:ctx.happyPhase,happyMode:ctx.happyMode,bubbleMotif:ctx.happyMotif,cool:ctx.coolPhase,coolClock:ctx.coolClock,coolLeftOwned:ctx.coolOwnsLeft(),keys:[...ctx.active],left:root.dataset.left||'idle',right:root.dataset.right||'idle',
+        gaming:ctx.gamingPhase,paused:ctx.paused,breathingEnabled:ctx.breathingEnabled,accessory:ctx.accessoryState(),bubbles:ctx.bubblesPhase,magic:ctx.magicPhase,magicFlat:ctx.magicOwnsHands(),happy:ctx.happyPhase,happyMode:ctx.happyMode,bubbleMotif:ctx.happyMotif,cool:ctx.coolPhase,coolClock:ctx.coolClock,coolLeftOwned:ctx.coolOwnsLeft(),keys:[...ctx.active],left:root.dataset.left||'idle',right:root.dataset.right||'idle',
         sleepEnabled:ctx.sleepEnabled,sleepSeconds:ctx.sleepDelayMs/1000,
         wake:ctx.wakePhase,wakeClock:ctx.wakeClock,sleep:ctx.sleepPhase,sleepArmFrame:ctx.sleepArmFrame,mouse:ctx.mouseMode,looking:ctx.looking,idleLooks:ctx.lookCount,idleLookLimit:ctx.lookLimit,
         busy:ctx.level,recovering:performance.now()<ctx.recoveryUntil,rate:ctx.rate,

@@ -19,12 +19,12 @@
       ctx.idleTimer=setTimeout(()=>{
         ctx.idleTimer=null;
         if(document.hidden || ctx.held.size || ctx.level || performance.now()<ctx.recoveryUntil || ctx.mouseMode || ctx.looking){queueSleep(2000);return;}
-        startSleep();
+        if(!ctx.tryIdleGaming?.())startSleep();
       },Math.max(delay,ctx.sleepDelayMs-2400-(performance.now()-ctx.idleSince)));
     }
     function startSleep() {
       if(ctx.disposed || ctx.wakePhase!=='none' || ctx.held.size || ctx.level || performance.now()<ctx.recoveryUntil || ctx.mouseMode || ctx.looking)return;
-      ctx.stopEggTimer();ctx.stopHappy(false);ctx.stopCool(false,true);clearTimeout(ctx.idleTimer);stopSleep();ctx.resetActivity();
+      ctx.stopGaming(false);ctx.stopEggTimer();ctx.stopMagic(false);ctx.stopBubbles(false);ctx.stopHappy(false);ctx.stopCool(false,true);clearTimeout(ctx.idleTimer);stopSleep();ctx.resetActivity();
       clearTimeout(ctx.bodyTimer);ctx.bounceOffset=0;
       ctx.cancelHand('left');ctx.cancelHand('right');
       ctx.pose('left','idle');ctx.pose('right','idle');ctx.sleepArmFrame=-1;

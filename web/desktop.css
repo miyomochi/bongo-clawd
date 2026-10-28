@@ -60,15 +60,25 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .is-paused .pause-block:active .card-face{transform:translateY(2px)}
 .is-paused .pause-block:active .cube{transform:none}
 
-/* Decorations: 5 thumbnails, select = preview, orange border; 取消 / 戴上. */
+/* Decorations: five visible tiles, browse separately from fitting. */
 .accessory-menu{position:absolute;left:8px;top:302px;width:372px;height:160px;padding:11px 14px 12px;border-radius:3px;background:var(--bg);color:var(--text);font-size:12px;
   box-shadow:inset 0 0 0 1px var(--line)}
 .accessory-menu.is-opening{visibility:hidden}
 .no-side .accessory-menu{left:4px;width:344px;padding:10px}
 .accessory-heading{display:flex;justify-content:space-between;align-items:baseline}
 .accessory-heading b{font-size:14px}.accessory-heading span{font-size:11px;color:var(--sub);letter-spacing:1px}
-.accessory-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 0 10px}
-.no-side .accessory-options{gap:5px}
+.accessory-carousel{position:relative;margin:8px 0 10px}
+.accessory-options{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/5);gap:6px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x}
+.accessory-options::-webkit-scrollbar{display:none}
+.accessory-options label{min-width:0;scroll-snap-align:start}
+.accessory-footer{display:flex;align-items:center;justify-content:space-between}
+.accessory-navigation{display:flex;gap:6px}
+.accessory-menu .accessory-arrow{width:34px;height:28px;padding:0;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.accessory-arrow svg{width:8px;height:12px;fill:currentColor;shape-rendering:crispEdges}
+.accessory-menu .accessory-arrow:hover:not(:disabled){background:var(--panel)}
+.accessory-menu .accessory-arrow:disabled{color:var(--sub);opacity:.4;cursor:default}
+.accessory-arrow:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.no-side .accessory-options{gap:5px;grid-auto-columns:calc((100% - 20px)/5)}
 .accessory-options label{position:relative;cursor:pointer;display:block}
 .accessory-options input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
 .tile{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px 5px;border:2px solid transparent;border-radius:3px;background:var(--panel);color:var(--sub);font-size:11px;white-space:nowrap}
@@ -84,6 +94,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .accessory-menu .actions .primary:hover{background:#e3845c}
 .accessory-menu button:disabled{opacity:.6;cursor:default}
 [data-accessory-error]{position:absolute;left:14px;bottom:15px;margin:0;color:#f0a07f;font-size:11px}
+.accessory-menu:has([data-accessory-error]:not([hidden])) .accessory-navigation{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.key-top,.pause-block,.card-face,.scene,.bubble,.block .cube{transition:none!important}}
 
 /* Mirror the entire workstation, including its side controls. Text stays readable. */

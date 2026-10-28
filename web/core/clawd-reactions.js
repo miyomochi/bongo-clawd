@@ -92,7 +92,7 @@
  const create=global.createClawdController;
  global.createClawdController=function(root,rig,options={}){
   const c=create(root,rig,options),extra=instances.get(root);Object.assign(c,extra);
-  for(const name of ['clearAll','destroy','sleep','wake','showSunglasses','showHappy','showDream','lookAround']){
+  for(const name of ['clearAll','destroy','sleep','wake','showSunglasses','showHappy','showDream','showBubbles','showMagic','showGaming','lookAround']){
    const fn=c[name];if(fn)c[name]=(...args)=>{extra.cancelReaction();return fn(...args);};
   }
   const paused=c.setPaused;c.setPaused=value=>{if(value)extra.cancelReaction();return paused(value);};

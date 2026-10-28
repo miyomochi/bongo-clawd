@@ -22,7 +22,7 @@
     function press(code, options = {}) {
       if(ctx.isAdjusting?.())return false;
       const k = ctx.lookup.get(code);
-      if (!k || ctx.disposed) return false;
+      if (!k || ctx.disposed){if(!ctx.disposed&&(ctx.bubblesPhase!=='none'||ctx.gamingOwnsHands?.()))ctx.markActivity();return false;}
       let hand=k.hand;
       if(code==='Space'){ctx.alternateSpace=!ctx.alternateSpace;hand=ctx.mouseMode ? 'left' : ctx.alternateSpace ? 'left' : 'right';}
       ctx.markActivity();
@@ -71,6 +71,7 @@
       if (ctx.disposed) return;
       ctx.markActivity();
       if(ctx.wakePhase!=='none'){ctx.lastKey.textContent='Mouse · 被发现了';ctx.refreshStatus();return;}
+      if(ctx.gamingOwnsHands?.()){ctx.refreshStatus();return;}
       const leftHeld=[...ctx.held].some(code=>ctx.lookup.get(code)?.hand==='left'||code==='Space');
       if(!leftHeld && performance.now()-ctx.lastLeftStroke>300&&!ctx.level)ctx.resetActivity();
       ctx.cancelHand('right');

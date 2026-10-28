@@ -2,7 +2,7 @@
 from pathlib import Path
 import re
 root=Path(__file__).resolve().parents[1]
-order=['renderer','behavior','sleep','wake','input','demo','cool','happy','eggs','headphones','controller']
+order=['renderer','behavior','sleep','wake','input','demo','cool','happy','bubbles','magic','gaming','eggs','accessory-carousel','cowboy','detective','headphones','controller']
 (root/'web/core/clawd.bundle.js').write_text('\n\n'.join((root/f'web/core/clawd-{name}.js').read_text(encoding='utf-8') for name in order),encoding='utf-8',newline='\n')
 p=root/'web/index.html';s=p.read_text(encoding='utf-8')
 s=re.sub(r'<svg\b.*?</svg>',lambda _: (root/'web/clawd-scene.svg').read_text(encoding='utf-8'),s,count=1,flags=re.S)

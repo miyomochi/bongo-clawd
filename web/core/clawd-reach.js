@@ -50,8 +50,10 @@
     instances.set(ctx.root,{setReachEnabled,getReachEnabled:()=>enabled});
     ctx.reachTargets=targets;ctx.reachCenters=centers;ctx.reachZoneTarget=zoneTarget;
     return {...api,pose,cancelHand(hand){api.cancelHand(hand);if(hand==='right')ctx.right.setAttribute('clip-path','url(#far-arm-visible)');},tapHand(hand){
+      if(ctx.gamingOwnsHands?.())return;
+      if(ctx.magicOwnsHands?.())return;
       if(!enabled||!targets[hand]||ctx.reduceMotion||ctx.sleepPhase!=='awake'||ctx.wakePhase!=='none')return api.tapHand(hand);
-      if(hand==='left'&&ctx.coolOwnsLeft?.())return;
+      if(hand==='left'&&(ctx.coolOwnsLeft?.()||ctx.bubblesOwnsLeft?.()))return;
       ctx.cancelHand(hand);
       const start={...ends[hand]},begin=performance.now(),quick=!!ctx.level;
       const neutralY=hand==='left'?89:76,amount=quick?.65:1,raw=targets[hand];

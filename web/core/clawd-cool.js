@@ -29,7 +29,7 @@
     const nodes=stars?[...stars.children]:[];
     let before='';
     const available=!!(glasses&&hand&&stars);
-    function eligible(){return !ctx.disposed&&ctx.happyPhase==='none'&&ctx.sleepPhase==='awake'&&ctx.wakePhase==='none'&&!ctx.held.size&&!ctx.active.size&&!ctx.mouseButtons.size&&!ctx.mouseMode&&!ctx.level&&performance.now()>=ctx.recoveryUntil&&!ctx.looking;}
+    function eligible(){return !ctx.gamingOwnsHands?.()&&ctx.magicPhase==='none'&&!ctx.disposed&&ctx.bubblesPhase==='none'&&ctx.happyPhase==='none'&&ctx.sleepPhase==='awake'&&ctx.wakePhase==='none'&&!ctx.held.size&&!ctx.active.size&&!ctx.mouseButtons.size&&!ctx.mouseMode&&!ctx.level&&performance.now()>=ctx.recoveryUntil&&!ctx.looking;}
     function coolOwnsLeft(){return !ctx.reduceMotion&&['fetching','lifting','adjusting'].includes(ctx.coolPhase);}
     function stopCool(reschedule=true,fadeForSleep=false){
       const transform=glasses?.getAttribute('transform');

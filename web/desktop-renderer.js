@@ -2,7 +2,7 @@
   'use strict';
   const root=document.getElementById('clawd-desktop');
   const rig=JSON.parse(document.getElementById('clawd-rig-data').textContent);
-  const controller=window.createClawdController(root,rig,{bindInput:false,bindDemo:false,sunglassesEnabled:true,happyEnabled:true,accessoryStorage:false,breathingEnabled:true,reachEnabled:true,onAccessoryConfirmed:line=>speak(line,'accessory')});
+  const controller=window.createClawdController(root,rig,{bindInput:false,bindDemo:false,sunglassesEnabled:true,happyEnabled:true,bubblesEnabled:true,magicEnabled:true,gamingEnabled:true,accessoryStorage:false,breathingEnabled:true,reachEnabled:true,onAccessoryConfirmed:line=>speak(line,'accessory')});
   const bridge=window.clawdDesktop;
   const connection=root.querySelector('[data-connection]'),toggle=root.querySelector('[data-toggle]');
   const panel=root.querySelector('[data-accessory-menu]'),error=root.querySelector('[data-accessory-error]');
@@ -215,14 +215,14 @@
   async function finishAccessories(confirm){
     if(disposed||saving||!controller.getState().accessory.menuOpen)return;
     accessoryGeneration++;cancelAnimationFrame(accessoryReveal);accessoryReveal=null;panel.classList.remove('is-opening');
-    saving=true;panel.querySelectorAll('button,input').forEach(n=>n.disabled=true);
+    saving=true;panel.querySelectorAll('input,[data-accessory-confirm],[data-accessory-cancel]').forEach(n=>n.disabled=true);
     try{
       if(confirm)await bridge.updateSettings({accessory:controller.getState().accessory.draft});
       controller.closeAccessoryMenu(confirm);forgetInput();layout();
       await bridge.adjustment?.(false);state(runtime);
     }catch{
       if(error){error.textContent='没保存上，请重试';error.hidden=false;}
-    }finally{saving=false;panel.querySelectorAll('button,input').forEach(n=>n.disabled=false);}
+    }finally{saving=false;panel.querySelectorAll('input,[data-accessory-confirm],[data-accessory-cancel]').forEach(n=>n.disabled=false);}
   }
   root.querySelectorAll('[data-accessory-open]').forEach(n=>n.addEventListener('click',()=>{if(controller.getState().accessory.menuOpen)finishAccessories(false);else openAccessories();}));
   panel.querySelectorAll('[name="clawd-accessory"]').forEach(n=>n.addEventListener('change',()=>{if(n.checked&&!saving)controller.selectAccessory(n.value);}));

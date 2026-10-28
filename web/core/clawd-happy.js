@@ -25,7 +25,7 @@
     ctx.happyEyes=eyes;
     function cancelDreamTimer(){clearTimeout(dreamTimer);dreamTimer=null;}
     function happyOwnsEyes(){return ctx.happyPhase==='smiling'&&ctx.happyMode==='awake';}
-    function canStartHappy(){return available&&!ctx.disposed&&ctx.happyPhase==='none'&&ctx.coolPhase==='none'&&ctx.sleepPhase==='awake'&&ctx.wakePhase==='none'&&!ctx.looking&&!ctx.level&&performance.now()>=ctx.recoveryUntil;}
+    function canStartHappy(){return !ctx.gamingOwnsHands?.()&&ctx.magicPhase==='none'&&available&&!ctx.disposed&&ctx.happyPhase==='none'&&ctx.coolPhase==='none'&&ctx.bubblesPhase==='none'&&ctx.sleepPhase==='awake'&&ctx.wakePhase==='none'&&!ctx.looking&&!ctx.level&&performance.now()>=ctx.recoveryUntil;}
     function anchorHappy(x,y){if(available)overlay.setAttribute('transform',`translate(${x} ${y})`);}
     function scheduleDream(first=false){
       cancelDreamTimer();

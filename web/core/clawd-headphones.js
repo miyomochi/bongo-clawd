@@ -17,20 +17,26 @@
     const variants={headphones:{rear,front,eyes,name:'天蓝耳机'},'cat-headphones':{
       rear:ctx.svg.querySelector('#cat-headphones-rear'),front:ctx.svg.querySelector('#cat-headphones-front'),eyes:ctx.happyEyes,name:'猫耳耳机'},
       sprout:{front:ctx.svg.querySelector('#sprout-front'),eyes:ctx.openEyes,name:'小苗',duration:1500},
+      'cowboy-hat':{front:ctx.svg.querySelector('#cowboy-hat-front'),eyes:ctx.openEyes,name:'牛仔帽',duration:2700},
+      'detective-hat':{front:ctx.svg.querySelector('#detective-hat-front'),eyes:ctx.openEyes,name:'侦探帽',duration:4400},
       duck:{front:ctx.svg.querySelector('#duck-front'),eyes:ctx.openEyes,name:'小黄鸭',duration:1300}};
     const sproutMotion=ctx.svg.querySelector('#sprout-motion');
     const duckMotion=ctx.svg.querySelector('#duck-motion'),duckContact=ctx.svg.querySelector('#duck-contact');
     const leaves=['left','right'].map(side=>ctx.svg.querySelector('#sprout-'+side+'-leaf'));
+    const cowboy=global.createClawdCowboyAnimation?.(ctx);
+    const detective=global.createClawdDetectiveAnimation?.(ctx);
     const panel=ctx.root.querySelector('[data-accessory-menu]');
     const opener=ctx.root.querySelector('[data-accessory-open]');
+    const carousel=global.createClawdAccessoryCarousel?.(panel,{reduceMotion:ctx.reduceMotion});
+    if(carousel)ctx.cleanup.push(()=>carousel.destroy());
     let frame=null,started=0,committed='none',draft='none',confirmedSpeech=null;
     ctx.menuOpen=false;ctx.accessoryPreview=false;ctx.accessoryPulse=0;ctx.headphoneEyes=eyes;
     function isAdjusting(){return ctx.paused||ctx.menuOpen||ctx.accessoryPreview;}
     function wear(value){
       Object.entries(variants).forEach(([id,v])=>[v.rear,v.front].filter(Boolean).forEach(n=>n.setAttribute('display',id===value?'inline':'none')));
       ctx.headphoneEyes=variants[value]?.eyes||eyes;
-      ctx.accessoryExpression=['sprout','duck'].includes(value)?value:'headphones';
-      ctx.accessoryCaption=value==='duck'?'坐稳啦':value==='sprout'?'啵，长高一点点':'跟着节奏敲~';
+      ctx.accessoryExpression=['sprout','duck','cowboy-hat','detective-hat'].includes(value)?value:'headphones';
+      ctx.accessoryCaption=value==='detective-hat'?'发现线索了。':value==='cowboy-hat'?'老板，来杯牛奶。':value==='duck'?'坐稳啦':value==='sprout'?'啵，长高一点点':'跟着节奏敲~';
       const colors=value==='cat-headphones'?['#d98eaf','#edabc7','#c5a56b']:['#5598bd','#82c5e6','#c5a56b'];
       noteNodes.forEach((n,i)=>n.querySelector('path')?.setAttribute('fill',colors[i]));
       ctx.root.dataset.accessory=value;
@@ -88,6 +94,7 @@
       cancelAnimationFrame(frame);frame=null;ctx.accessoryPreview=false;ctx.accessoryPulse=0;
       resetSprout();
       resetDuck();
+      cowboy?.reset();detective?.reset();
       if(notes){notes.setAttribute('display','none');noteNodes.forEach(n=>{n.setAttribute('display','none');n.removeAttribute('transform');n.removeAttribute('opacity');});}
       if(eyes)eyes.setAttribute('display','none');
       ctx.refreshEyes();ctx.renderBody();ctx.refreshStatus();syncMenu();
@@ -99,6 +106,14 @@
     }
     function paint(now){
       const elapsed=now-started;
+      if(draft==='detective-hat'&&detective){
+        ctx.accessoryPulse=0;detective.paint(elapsed);notes.setAttribute('display','none');
+        ctx.refreshEyes();ctx.renderBody();ctx.refreshStatus();return;
+      }
+      if(draft==='cowboy-hat'&&cowboy){
+        ctx.accessoryPulse=0;cowboy.paint(elapsed);notes.setAttribute('display','none');
+        ctx.refreshEyes();ctx.renderBody();ctx.refreshStatus();return;
+      }
       if(draft==='sprout'||draft==='duck'){
         ctx.accessoryPulse=0;
         if(draft==='duck')paintDuck(elapsed);else paintSprout(elapsed);
@@ -134,11 +149,12 @@
       ctx.menuOpen=true;ctx.clearAll();
       clearTimeout(ctx.blinkTimer);clearTimeout(ctx.blinkEnd);ctx.blinkTimer=ctx.blinkEnd=null;ctx.blinking=false;
       draft=committed;wear(draft);syncMenu();ctx.refreshEyes();ctx.renderBody();ctx.refreshStatus();
+      carousel?.refresh();carousel?.reveal(draft);
       ctx.root.querySelector('[name="clawd-accessory"]:checked')?.focus({preventScroll:true});return true;
     }
     function selectAccessory(value){
       if(!ctx.menuOpen||!(value==='none'||Object.hasOwn(variants,value))||ctx.disposed)return false;
-      stopAccessoryPreview(false);draft=value;wear(draft);syncMenu();
+      stopAccessoryPreview(false);draft=value;wear(draft);syncMenu();carousel?.reveal(draft);
       if(variants[value])startAccessoryPreview();return true;
     }
     function closeAccessoryMenu(confirm=true){
@@ -177,6 +193,6 @@
     }
     wear(draft);syncMenu();
     return {isAdjusting,stopAccessoryPreview,startAccessoryPreview,openAccessoryMenu,selectAccessory,closeAccessoryMenu,restoreAccessory,bindAccessories,
-      accessoryState:()=>({selected:committed,draft,menuOpen:ctx.menuOpen,preview:ctx.accessoryPreview,pulse:ctx.accessoryPulse,phase:(draft==='duck'?ctx.duckPhase:ctx.sproutPhase)||'none'})};
+      accessoryState:()=>({selected:committed,draft,menuOpen:ctx.menuOpen,preview:ctx.accessoryPreview,pulse:ctx.accessoryPulse,phase:(draft==='detective-hat'?ctx.detectivePhase:draft==='cowboy-hat'?ctx.cowboyPhase:draft==='duck'?ctx.duckPhase:ctx.sproutPhase)||'none'})};
   };
 })(window);

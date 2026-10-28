@@ -28,7 +28,7 @@
     function queueLook(delay=12000+Math.random()*6000) {
       if(ctx.isAdjusting?.())return;
       clearTimeout(ctx.idleTimer);
-      if ((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none')){if(ctx.sleepEnabled)ctx.queueSleep(0);return;}
+      if ((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none')||(ctx.bubblesPhase&&ctx.bubblesPhase!=='none')||(ctx.magicPhase&&ctx.magicPhase!=='none')||(ctx.gamingPhase&&ctx.gamingPhase!=='none')){if(ctx.sleepEnabled)ctx.queueSleep(0);return;}
       if (ctx.disposed || ctx.sleepPhase!=='awake' || ctx.wakePhase!=='none') return;
       const remaining=ctx.sleepDelayMs-2400-(performance.now()-ctx.idleSince);
       if(ctx.sleepEnabled){
@@ -47,6 +47,7 @@
     }
 
     function markActivity() {
+      ctx.interruptGaming?.();ctx.idleChoice=null;
       ctx.idleSince=performance.now();
       clearTimeout(ctx.idleTimer);
       if(ctx.sleepPhase==='asleep')ctx.startWake();
@@ -57,7 +58,7 @@
     }
 
     function startLook() {
-      if((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none'))return;
+      if((ctx.coolPhase&&ctx.coolPhase!=='none')||(ctx.happyPhase&&ctx.happyPhase!=='none')||(ctx.bubblesPhase&&ctx.bubblesPhase!=='none')||(ctx.magicPhase&&ctx.magicPhase!=='none')||(ctx.gamingPhase&&ctx.gamingPhase!=='none'))return;
       if(ctx.disposed || ctx.sleepPhase!=='awake' || ctx.wakePhase!=='none' || ctx.held.size || ctx.level || performance.now()<ctx.recoveryUntil || ctx.mouseMode) return;
       clearTimeout(ctx.idleTimer); ctx.stopLook();
       ctx.looking=true;ctx.lookStart=performance.now();ctx.lookCount++;
@@ -99,6 +100,7 @@
       if (ctx.recoveryUntil && now>=ctx.recoveryUntil) ctx.recoveryUntil=0;
       ctx.root.dataset.recovering=String(now<ctx.recoveryUntil);
       ctx.level=next; ctx.root.dataset.busy=String(ctx.level);
+      if(ctx.level){ctx.hurryBubbles?.();ctx.hurryMagic?.();}
       if((ctx.level||now<ctx.recoveryUntil)&&ctx.happyPhase==='smiling')ctx.popHappy();
       if (!ctx.level) { ctx.nextSurge=Infinity; ctx.surgeUntil=0; }
       else {
