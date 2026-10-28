@@ -3,8 +3,9 @@ Unicode true
 !include "x64.nsh"
 !include "FileFunc.nsh"
 Var UpdateMode
+Var OriginalDesktopShortcut
 !ifndef VERSION
-!define VERSION "0.4.0-beta"
+!define VERSION "0.4.0"
 !endif
 Name "Bongo Clawd"
 OutFile "${OUTPUT}"
@@ -18,7 +19,7 @@ UninstallIcon "${ICON}"
 !define MUI_UNICON "${ICON}"
 !define MUI_CUSTOMFUNCTION_ABORT UpdateAborted
 !define MUI_ABORTWARNING
-!define MUI_WELCOMEPAGE_TEXT "这是不稳定的 Beta 试验版。$\r$\n$\r$\n将为当前用户安装 Bongo Clawd，并创建开始菜单入口。$\r$\n$\r$\n安装前请先从托盘菜单退出正在运行的小蟹。$\r$\n$\r$\n需要系统已安装 Microsoft Edge WebView2 Runtime；本安装包不包含该运行时。"
+!define MUI_WELCOMEPAGE_TEXT "将为当前用户安装 Bongo Clawd，并创建开始菜单入口。$\r$\n$\r$\n安装前请先从托盘菜单退出正在运行的小蟹。$\r$\n$\r$\n需要系统已安装 Microsoft Edge WebView2 Runtime；本安装包不包含该运行时。"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_COMPONENTS
 !define MUI_PAGE_CUSTOMFUNCTION_PRE UpdateDirectoryPre
@@ -52,11 +53,28 @@ Function .onInstFailed
 FunctionEnd
 Function .onInit
   StrCpy $UpdateMode "0"
+  StrCpy $OriginalDesktopShortcut "0"
+  IfFileExists "$DESKTOP\Bongo Clawd.lnk" 0 +2
+    StrCpy $OriginalDesktopShortcut "1"
   ${GetParameters} $R0
   ClearErrors
   ${GetOptions} $R0 "/UPDATE" $R1
   IfErrors +2 0
     StrCpy $UpdateMode "1"
+  StrCmp $UpdateMode "1" 0 normal_setup
+    SetSilent silent
+    ReadEnvStr $R2 "CLAWD_UPDATE_TARGET_DIR"
+    StrCmp $R2 "" use_old_exe
+      StrCpy $INSTDIR $R2
+      Goto target_ready
+    use_old_exe:
+      ReadEnvStr $R2 "CLAWD_UPDATE_OLD_EXE"
+      StrCmp $R2 "" target_ready
+        ${GetParent} "$R2" $INSTDIR
+    target_ready:
+    StrCmp $OriginalDesktopShortcut "1" normal_setup
+      SectionSetFlags 1 0
+  normal_setup:
   ${IfNot} ${RunningX64}
     MessageBox MB_OK|MB_ICONSTOP "Bongo Clawd 需要 Windows 10 / 11 x64。"
     Abort
@@ -80,13 +98,17 @@ Section "Bongo Clawd（必选）" MainSection
   CreateShortcut "$SMPROGRAMS\Bongo Clawd\卸载 Bongo Clawd.lnk" "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "DisplayName" "Bongo Clawd"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "Publisher" "miyomochi"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "Publisher" "小猫蛋挞/Miyo"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "DisplayIcon" "$INSTDIR\Bongo-Clawd.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "InstallLocation" "$INSTDIR"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\BongoClawd" "NoRepair" 1
 SectionEnd
+Function .onInstSuccess
+  StrCmp $UpdateMode "1" 0 +2
+    Exec '$\"$INSTDIR\Bongo-Clawd.exe$\" --updated'
+FunctionEnd
 Section "创建桌面快捷方式" DesktopSection
   CreateShortcut "$DESKTOP\Bongo Clawd.lnk" "$INSTDIR\Bongo-Clawd.exe" "--open-settings"
 SectionEnd

@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 try {
     # Wait for the running executable to release its files before the wizard starts.
     Wait-Process -Id ([int]$env:CLAWD_UPDATE_PID) -ErrorAction SilentlyContinue
-    $argsForInstaller = @('/UPDATE')
+    $argsForInstaller = @('/UPDATE', '/S')
     if ($env:CLAWD_UPDATE_TARGET_DIR) {
         # NSIS requires /D to be last and unquoted, including paths with spaces.
         $argsForInstaller += ('/D=' + $env:CLAWD_UPDATE_TARGET_DIR)

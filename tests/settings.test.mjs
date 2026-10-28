@@ -12,6 +12,7 @@ function setup(){
   window.clawdDesktop={state(fn){listener=fn;return()=>{};},snapshot:async()=>state,
     updateSettings:async patch=>{calls.push(['preferences',patch]);notify(patch);},
     autostart:async enabled=>{calls.push(['autostart',enabled]);if(fail)throw new Error('registry denied');notify({autostartEnabled:enabled});},
+    openProjectLink:async target=>{calls.push(['project-link',target]);},
     checkUpdates:async()=>{calls.push(['update']);},uninstall:async()=>{calls.push(['uninstall']);}};
   vm.runInContext(fs.readFileSync(new URL('../web/settings-renderer.js',import.meta.url),'utf8'),vm.createContext({window,document}));
   return {document,window,calls,notify,fail:()=>{fail=true;},click:id=>document.getElementById(id).dispatchEvent(new window.Event('click',{bubbles:true})),change:(id,value)=>{const input=document.getElementById(id);input.checked=value;input.dispatchEvent(new window.Event('change',{bubbles:true}));}};
@@ -42,4 +43,9 @@ test('appearance can persist the original short-hand mode and restore directiona
 test('beta automatic checks are opt-in and persisted separately from arm settings',async()=>{
  const s=setup();await flush();assert.equal(s.document.getElementById('autoCheckUpdates').checked,false);
  s.change('autoCheckUpdates',true);await flush();assert.equal(s.calls[0][1].autoCheckUpdates,true);
+});
+
+test('about opens the named author profile and repository through the native link action',async()=>{
+ const s=setup();await flush();s.click('about-toggle');assert.equal(s.document.getElementById('about').hidden,false);
+ assert.equal(s.document.getElementById('author-link').textContent,'小猫蛋挞/Miyo');s.click('author-link');s.click('repository-link');await flush();assert.deepEqual(s.calls.filter(c=>c[0]==='project-link'),[['project-link','author'],['project-link','repository']]);
 });

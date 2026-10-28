@@ -22,6 +22,7 @@
     updateSettings:patch=>invoke('clawd_update_settings',{patch}),
     closeSettings:()=>invoke('clawd_close_settings'),
     retry:()=>invoke('clawd_retry'),
+    openProjectLink:target=>invoke('clawd_open_project_link',{target}),
     usage:()=>invoke('clawd_usage'),
     autostart:enabled=>invoke('clawd_autostart',{enabled}),
     checkUpdates:()=>invoke('clawd_check_updates'),

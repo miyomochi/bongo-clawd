@@ -7,8 +7,8 @@
   function render(next){
    if(disposed)return;if(next?.phase==='available'&&value.phase!=='available')snooze.checked=false;value=next||{phase:'idle'};
    const phase=value.phase;
-   title.textContent=({idle:'小蟹更新',checking:'小蟹正在检查更新',current:'已经是最新版本',available:'发现小蟹新版本！',downloading:'正在下载更新',verifying:'正在校验更新包',installing:'准备打开安装向导',success:'更新完成！',error:'这次更新没成功'})[phase]||'小蟹更新';
-   message.textContent=phase==='error'?value.error||'请稍后重试。':({checking:'正在查看有没有新版本…',current:'小蟹已经准备好继续工作。',available:value.installed?'安装向导会更新当前安装位置，并保留个人设置。':'将下载并打开安装版向导，个人设置会保留。',downloading:'下载完成后会核对 SHA-256，再打开安装向导。',verifying:'确认下载内容完整且与发布版本一致。',installing:'小蟹将退出，随后打开安装向导。',success:value.message||'小蟹变得更厉害了一点！'})[phase]||'';
+   title.textContent=({idle:'小蟹更新',checking:'小蟹正在检查更新',current:'已经是最新版本',available:'发现小蟹新版本！',downloading:'正在下载更新',verifying:'正在校验更新包',installing:'准备安装更新',success:'更新完成！',error:'这次更新没成功'})[phase]||'小蟹更新';
+   message.textContent=phase==='error'?value.error||'请稍后重试。':({checking:'正在查看有没有新版本…',current:'小蟹已经准备好继续工作。',available:'将更新到原位置，并保留个人设置。',downloading:'下载完成后会核对 SHA-256，再安装更新。',verifying:'确认下载内容完整且与发布版本一致。',installing:'小蟹将退出，安装完成后自动重启。',success:value.message||'小蟹变得更厉害了一点！'})[phase]||'';
    version.textContent=value.release?.version?'版本 '+value.release.version:'';
    noteBlock.hidden=!['available','current'].includes(phase);notes.textContent=value.release?.notes||'发布者暂未提供更新日志。';
    progress.hidden=!busy();const finite=phase==='downloading'&&Number.isFinite(value.progress);progress.classList.toggle('is-indeterminate',!finite);fill.style.width=finite?Math.round(Math.max(0,Math.min(1,value.progress))*100)+'%':'28%';if(finite)progress.setAttribute('aria-valuenow',String(Math.round(value.progress*100)));else progress.removeAttribute('aria-valuenow');progress.setAttribute('aria-valuemin','0');progress.setAttribute('aria-valuemax','100');progress.setAttribute('aria-label',finite?'下载进度 '+Math.round(value.progress*100)+'%':'处理中');

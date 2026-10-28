@@ -56,3 +56,5 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 .system-actions{display:flex;gap:8px;flex-wrap:wrap}.system-actions button{padding:8px 12px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}.system-actions button:hover{border-color:var(--accent)}.system-actions button:disabled{opacity:.5;cursor:wait}
+
+.sheet a{color:var(--accent,#e68a64);text-underline-offset:3px}

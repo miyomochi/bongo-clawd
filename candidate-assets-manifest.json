@@ -15,11 +15,11 @@
   "desktop-renderer.js": "bace2c3cfe836c1fb01794075e52a35a41d9f5f94c3f917693729448d51b215c",
   "desktop.css": "ed6f639f9383503e10488826907fe1a40db5b6e11cab3741848d03cb07f54fbd",
   "index.html": "4f7d580c65b5b83c66418f53b63ac769cbf5f5b134ada54a6c2d30b13f07d89b",
-  "lite-bridge.js": "46ef0117ea078a736795286349f841b7c95c6a66fcd653397084fc6d5e1dbe81",
+  "lite-bridge.js": "e730370fb507ca24c81f81c7f708c88f70df76ab7745b770d3822c14635544ab",
   "rig-data.json": "a958168389ac8669d48de8a8e9c23a1ed81b8e0c09cada8127db426f7e75d62c",
-  "settings-renderer.js": "fdb74e69c257416ceaf093a2157f5a8633783ea7f03df7c9f2d90320b255045c",
-  "settings.css": "c5fcc09f69124992f97e5a4693b4674fd8c1d889b4a8b0626a93cbad8a50ec4f",
-  "settings.html": "723be80c60cb297928ec9d42bae4dd835f10c7dd27f499114e6d29d08a95d47b",
+  "settings-renderer.js": "62c9a96d2f18b18ec745a38da36384e64103713de8c35bc1df988d5192f6b5b6",
+  "settings.css": "fec60f8cde9c3a42f67f5d8d0fa25d310b5fc3c308bc2f0c1544852862e53a2b",
+  "settings.html": "0da7befb506dab3a58baf9ee541444489043a0de937b9cc06104773d083a716b",
   "thumbs/cat-headphones.png": "d0374322c50e853c108d00d9f50212c19f151e706926d32f14da2a3d0da0e08c",
   "thumbs/duck.png": "19499aa4a58ca9d6f1beed6b96e94bb79cf6fdaea0dd35cbee13845fb4076e57",
   "thumbs/headphones.png": "7af6210912c690148c11dd1d1bc8201e80fc17fba0974dbbffb60ae95a1e6994",
@@ -29,7 +29,7 @@
   "core/clawd-reach.js": "16b5d1162c5313a4ab5416d14b8dcc97b19b46872be76ec039132e83d1a2e7a9",
   "core/clawd-reactions.js": "f9c96637687aeb7408cab04e4ccbb6a5053031ffa4b2f89e97e906b94e606628",
   "core/clawd-update-visuals.js": "e22ba68260e956a449cdeb39ba5ef2d8c30545ac33d378eff938313158abe24a",
-  "update-dialog.js": "933229f54da3d2bbe0cea9b93acba67d819b9bb210da8cdef2bca1669d70114a",
+  "update-dialog.js": "962fe60cd995901c2fc4ed1d41fe4812f18ff6bb6afaa4674db121c5f02f61db",
   "updates.html": "50a1f69674556f74c8c8b9caa6a76d73bdf136ded742262ce5c00a38da3b12f4",
   "updates.css": "54b2c18c8ddd528fb8dd784311f332ef9e0dd7e69d1876cdcc6a8e22322caf6c",
   "updates-page.js": "ac4e42ce8def43fe393e4cdc5e3845e4d5f065d30e0d6243672a75d8b7b91bae",
@@ -39,6 +39,6 @@
   "core/clawd-cowboy.js": "a4c51801b1c4c7e38f00cc156b9ae9e8dc362f2434086e7c4a29ffcda0d6bc07",
   "core/clawd-bubbles.js": "60fa6fb4579032de1f42b230d71d7c9023e0c0be59d4514a62be7c82d02c6c9b",
   "core/clawd-detective.js": "1d7d3c562966df708d61b2a3d4a2f1d3151742116139395c6fb57332cb284bde",
-  "thumbs/cowboy-hat.png": "b7a038656f77e49b274a74811d78a6dff9d6cf1ac543d8155966ff59fdd05907",
-  "thumbs/detective-hat.png": "69839ab6f260565d657882fb0c784adc383a148c40cc3647cb8524ed10cece37"
+  "thumbs/cowboy-hat.png": "f716e4e9affc8f2c7280909a2c1dbc14e7e13ac247b71f7cb408f25e4734b140",
+  "thumbs/detective-hat.png": "c71e322392feb664b4c77f438a0b9421caa82d0b80a10fdbfefa1acc8c479c9a"
 }

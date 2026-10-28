@@ -13,14 +13,14 @@ jobs:
     env:
       PYTHONUTF8: 1
     steps:
-      - name: Cancel superseded beta builds
-        if: github.ref_name == 'release/beta-0.4.0'
+      - name: Cancel superseded release builds
+        if: github.ref_name == 'release/stable-0.4.0'
         continue-on-error: true
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $runs = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs?branch=release/beta-0.4.0&status=in_progress" | ConvertFrom-Json
+          $runs = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs?branch=release/stable-0.4.0&status=in_progress" | ConvertFrom-Json
           foreach ($run in $runs.workflow_runs) {
             if ($run.id -ne [long]$env:GITHUB_RUN_ID -and $run.head_sha -ne $env:GITHUB_SHA) {
               gh run cancel $run.id --repo $env:GITHUB_REPOSITORY
@@ -47,9 +47,9 @@ jobs:
           rustup show
           cargo test --manifest-path core-tests/Cargo.toml --locked
           if ($LASTEXITCODE -ne 0) { throw 'Core checks failed' }
-      - name: Verify beta provenance
-        if: startsWith(github.ref_name, 'release/beta-')
-        run: python scripts/verify-edition.py beta
+      - name: Verify stable provenance
+        if: startsWith(github.ref_name, 'release/stable-')
+        run: python scripts/verify-edition.py stable
       - name: Build portable package
         shell: pwsh
         run: ./scripts/build-windows.ps1
@@ -63,9 +63,11 @@ jobs:
           Compress-Archive -Path "dist/Bongo-Clawd-$version-Windows-x64-Setup.exe" -DestinationPath "dist/Bongo-Clawd-$version-Windows-x64-Setup.zip" -Force
           Get-ChildItem dist/*.zip | ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
       - name: Verify update package extraction
-        if: startsWith(github.ref_name, 'release/beta-')
         shell: pwsh
         run: ./scripts/verify-update-package.ps1
+      - name: Verify silent in-place update
+        shell: pwsh
+        run: ./scripts/verify-inplace-update.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: Bongo-Clawd-Windows-${{ github.sha }}
@@ -75,8 +77,8 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish 0.4.0 beta and update beta feed
-        if: github.ref_name == 'release/beta-0.4.0'
+      - name: Publish 0.4.0 and update release feeds
+        if: github.ref_name == 'release/stable-0.4.0'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/publish-next-beta.py
+        run: python scripts/publish-stable.py

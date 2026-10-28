@@ -77,6 +77,7 @@
   function closeSheets(except){for(const [k,[sheet,btn]] of Object.entries(sheets))if(k!==except){sheet.hidden=true;btn.setAttribute('aria-expanded','false');}}
   for(const [k,[sheet,btn]] of Object.entries(sheets))btn.addEventListener('click',()=>{const open=sheet.hidden;closeSheets(k);sheet.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
+  for(const [id,target] of [['author-link','author'],['repository-link','repository']])$(id).addEventListener('click',e=>{e.preventDefault();Promise.resolve(bridge.openProjectLink?.(target)).catch(()=>{});});
   $('usage').addEventListener('click',()=>Promise.resolve(bridge.usage?.()).catch(()=>{}));
   $('retry-input').addEventListener('click',()=>Promise.resolve(bridge.retry?.()).catch(()=>{}));
   async function systemAction(button,action){

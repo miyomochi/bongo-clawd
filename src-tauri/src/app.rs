@@ -106,7 +106,7 @@ pub fn snapshot(app: &tauri::AppHandle) -> Value {
     let a = s.adjustments.lock().unwrap();
     let mut value = serde_json::to_value(p).unwrap();
     let map = value.as_object_mut().unwrap();
-    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Beta · 更新功能不稳定","autostartEnabled":system::autostart_enabled(),"installed":system::installed(),"version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
+    map.extend(json!({"enabled":r.enabled,"running":r.running,"phase":r.phase,"detail":r.detail,"platform":"win32","settingsOpen":a.settings,"accessoryOpen":a.accessory,"popupOpen":a.popup,"edition":"Windows 桌面版","autostartEnabled":system::autostart_enabled(),"installed":system::installed(),"version":env!("CARGO_PKG_VERSION")}).as_object().unwrap().clone());
     value.as_object_mut().unwrap().insert("update".into(), serde_json::to_value(crate::update_service::view(app)).unwrap());
     value
 }
@@ -475,6 +475,12 @@ async fn clawd_install_update(window: WebviewWindow) -> Result<(),String> {
     tauri::async_runtime::spawn_blocking(move || crate::update_service::install(&app)).await.map_err(|e|e.to_string())?
 }
 #[tauri::command]
+fn clawd_open_project_link(window: WebviewWindow, target: String) -> Result<(), String> {
+    authorize(&window, false)?;
+    if window.label() != "settings" { return Err("Settings window required".into()); }
+    system::open_project_link(&target)
+}
+#[tauri::command]
 async fn clawd_uninstall(window: WebviewWindow) -> Result<(), String> {
     authorize(&window, false)?;
     if window.label() != "settings" { return Err("Settings window required".into()); }
@@ -556,6 +562,7 @@ pub fn run() {
             clawd_update_snapshot,
             clawd_update_dismiss,
             clawd_install_update,
+            clawd_open_project_link,
             clawd_uninstall
         ])
         .on_menu_event(|app, event| menu_action(app, event.id().as_ref()))

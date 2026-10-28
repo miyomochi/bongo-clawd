@@ -9,6 +9,14 @@ fn owner(app: &tauri::AppHandle) -> isize {
 
 pub fn autostart_enabled() -> bool { native::autostart_enabled() }
 pub fn set_autostart(enabled: bool) -> Result<(), String> { native::set_autostart(enabled) }
+pub fn open_project_link(target: &str) -> Result<(), String> {
+    let url = match target {
+        "author" => "https://github.com/miyomochi",
+        "repository" => "https://github.com/miyomochi/bongo-clawd",
+        _ => return Err("Unknown project link".into()),
+    };
+    native::open_url(url)
+}
 pub fn installed() -> bool { native::uninstaller().is_some() }
 
 pub fn fetch_update_manifest() -> Result<Vec<u8>, String> { native::fetch_manifest() }
@@ -29,7 +37,7 @@ fn powershell() -> std::path::PathBuf {
 pub fn launch_update(installer: &std::path::Path) -> Result<(), String> {
     use std::os::windows::process::CommandExt;
     let old = std::env::current_exe().map_err(|e| e.to_string())?;
-    let target = if installed() { old.parent().map(|p| p.to_path_buf()) } else { None };
+    let target = old.parent().map(|p| p.to_path_buf());
     std::process::Command::new(powershell())
         .args(["-NoProfile", "-NonInteractive", "-Command", include_str!("update-launch.ps1")])
         .env("CLAWD_UPDATE_PID", std::process::id().to_string()).env("CLAWD_UPDATE_INSTALLER", installer)
@@ -120,7 +128,7 @@ mod native {
             let session = handle(WinHttpOpen(wide("BongoClawd/0.2.1").as_ptr(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, null(), null(), 0))?;
             WinHttpSetTimeouts(session.0, 8000, 8000, 10000, 10000);
             let connection = handle(WinHttpConnect(session.0, wide("raw.githubusercontent.com").as_ptr(), 443, 0))?;
-            let request = handle(WinHttpOpenRequest(connection.0, wide("GET").as_ptr(), wide("/miyomochi/bongo-clawd/main/updates/beta.json").as_ptr(), null(), null(), null(), WINHTTP_FLAG_SECURE))?;
+            let request = handle(WinHttpOpenRequest(connection.0, wide("GET").as_ptr(), wide("/miyomochi/bongo-clawd/main/updates/latest.json").as_ptr(), null(), null(), null(), WINHTTP_FLAG_SECURE))?;
             let headers = wide("Cache-Control: no-cache\r\n");
             if WinHttpSendRequest(request.0, headers.as_ptr(), u32::MAX, null(), 0, 0, 0) == 0 || WinHttpReceiveResponse(request.0, null_mut()) == 0 { return Err("连接更新服务器失败。".into()); }
             let mut status = 0u32;

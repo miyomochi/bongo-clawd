@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · Beta 设置</title><link rel="stylesheet" href="settings.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clawd · 设置</title><link rel="stylesheet" href="settings.css"></head>
 <body>
 <main class="card">
-<header class="head"><h1>设置 · Beta</h1><button id="help-toggle" class="icon" type="button" data-help aria-expanded="false" aria-controls="help" title="说明">?</button></header>
+<header class="head"><h1>设置</h1><button id="help-toggle" class="icon" type="button" data-help aria-expanded="false" aria-controls="help" title="说明">?</button></header>
 <nav class="tabs" role="tablist" aria-label="设置分类">
 <button type="button" role="tab" id="tab-appearance" data-tab="appearance" aria-selected="true" aria-controls="panel-appearance">外观</button>
 <button type="button" role="tab" id="tab-rest" data-tab="rest" aria-selected="false" aria-controls="panel-rest" tabindex="-1">休息</button>
@@ -16,8 +16,8 @@
 <input id="scale" type="range" min="60" max="160" step="1" value="100">
 <div class="chips" role="group" aria-label="快捷大小"><button type="button" data-scale="75">75%</button><button type="button" data-scale="100">100%</button><button type="button" data-scale="125">125%</button><button type="button" data-scale="150">150%</button></div>
 </div>
-<label class="row switch"><span>手臂方向感<small>轻微向远近、内外伸手；关闭沿用原来的小短手</small></span><input id="directionalArms" type="checkbox" checked><i aria-hidden="true"></i></label>
-<label class="row switch"><span>镜像工位<small>左右翻转，按钮一起换边，文字保持正向</small></span><input id="mirrored" type="checkbox"><i aria-hidden="true"></i></label>
+<label class="row switch"><span>手臂方向感<small>关闭沿用原固定位</small></span><input id="directionalArms" type="checkbox" checked><i aria-hidden="true"></i></label>
+<label class="row switch"><span>镜像工位<small>左右翻转</small></span><input id="mirrored" type="checkbox"><i aria-hidden="true"></i></label>
 <label class="row switch"><span>始终置顶</span><input id="alwaysOnTop" type="checkbox" checked><i aria-hidden="true"></i></label>
 <label class="row switch"><span>侧边按钮<small>右侧的设置、装饰、暂停方块</small></span><input id="sideButtons" type="checkbox" checked><i aria-hidden="true"></i></label>
 <label class="row switch"><span>小蟹台词<small>状态变化时在头顶冒泡</small></span><input id="bubbleLines" type="checkbox" checked><i aria-hidden="true"></i></label>
@@ -35,9 +35,8 @@
 <p class="note">只记录次数，不读取输入内容</p>
 </section>
 <section class="panel" id="panel-system" data-panel="system" role="tabpanel" aria-labelledby="tab-system" hidden>
-<label class="row switch"><span>开机自启动<small>登录 Windows 后自动显示小蟹</small></span><input id="autostartEnabled" type="checkbox"><i aria-hidden="true"></i></label>
-<p class="note">Beta 更新试验不稳定，愿意尝鲜再开启；安装前会再次询问。</p>
-<label class="row switch"><span>每天自动检查更新 · Beta<small>每天首次启动检查，默认关闭，可手动检查</small></span><input id="autoCheckUpdates" type="checkbox"><i aria-hidden="true"></i></label>
+<label class="row switch"><span>开机自启动</span><input id="autostartEnabled" type="checkbox"><i aria-hidden="true"></i></label>
+<label class="row switch"><span>自动检查更新<small>每天首次启动检查，默认关闭，可手动检查</small></span><input id="autoCheckUpdates" type="checkbox"><i aria-hidden="true"></i></label>
 <div class="system-actions"><button type="button" id="check-updates">检查更新</button><button type="button" id="uninstall">卸载 Bongo Clawd</button></div>
 <p class="note" id="install-note"></p>
 <p class="note" id="system-status" role="status" aria-live="polite"></p>
@@ -53,6 +52,8 @@
 <div class="sheet" id="about" hidden role="region" aria-label="关于">
 <h2>关于</h2>
 <p id="about-version">Bongo Clawd</p>
+<p>作者：<a href="https://github.com/miyomochi" id="author-link">小猫蛋挞/Miyo</a></p>
+<p>仓库：<a href="https://github.com/miyomochi/bongo-clawd" id="repository-link">Bongo Clawd</a></p>
 <p>联动状态：<span id="about-phase">连接中</span></p>
 <div class="sheet-actions"><button type="button" id="usage">运行占用</button><button type="button" id="retry-input">重试连接</button></div>
 </div>
