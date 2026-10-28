@@ -13,6 +13,8 @@ jobs:
       PYTHONUTF8: 1
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Frontend checks
         shell: pwsh
         run: |
@@ -64,3 +66,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/publish-next-beta.py
+
