@@ -1,6 +1,6 @@
 {
-  "version": "0.4.0-beta",
-  "download_url": "https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0-beta/Bongo-Clawd-0.4.0-beta-Windows-x64-Setup.zip",
-  "sha256": "60e139c5ca6b323a5063f719374f2fb4e77883e30434882b1e4693795cd89895",
-  "notes": "新增衣柜翻页、牛仔帽玫瑰玩具枪、侦探帽放大镜、待机摸鱼、吹泡泡和魔法变身彩蛋；补齐普通键鼠及快速敲击衔接。继承上一Beta的自动检查更新、下载校验和安装向导升级机制。仍为试验版，等待Windows实机更新及新功能验收。"
+  "version": "0.4.0",
+  "download_url": "https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0/Bongo-Clawd-0.4.0-Windows-x64-Setup.zip",
+  "sha256": "1dd63aec23bbb5e876edd4d8073b12a4fedc1ad936cb6444ff4f57db1da7d9a3",
+  "notes": "- 新增牛仔帽、侦探帽装扮及专属动作。\n- 新增「偷偷打游戏」「吹泡泡」「魔法变身」待机动作。\n- 新增装饰翻页，统一装饰预览样式。\n- 完善快速敲击时的动画衔接。\n- 自动检查更新功能已通过实机验证，更新时直接安装到原位置。\n- 精简设置说明，关于页面增加作者及仓库链接。"
 }

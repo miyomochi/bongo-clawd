@@ -1,6 +1,6 @@
 {
-  "version": "0.3.0",
-  "download_url": "https://raw.githubusercontent.com/miyomochi/bongo-clawd/main/downloads/Bongo-Clawd-0.3.0-Windows-x64-Setup.zip",
-  "sha256": "9659ce49da4a17ee2d4c549ec4a092382a06c6198ab29f872a3401da9846c568",
-  "notes": "修复了戳一戳不响应问题，添加了新的临时图标。正式加入四种戳一戳：歪头挠挠、害羞爱心、果冻弹弹、眯眼摇摇唱歌。外观新增手臂方向感开关，按远近和内外轻微伸手；幅度太大像面筋，观感怪，新版稍微改善打字感，但不多，喜欢更小短手的也可关闭沿用原来。轻点、右击和拖拽分别处理。自动检查和应用内下载/安装仅在 beta 试验，稳定版仍可手动检查更新。"
+  "version": "0.4.0",
+  "download_url": "https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0/Bongo-Clawd-0.4.0-Windows-x64-Setup.zip",
+  "sha256": "1dd63aec23bbb5e876edd4d8073b12a4fedc1ad936cb6444ff4f57db1da7d9a3",
+  "notes": "- 新增牛仔帽、侦探帽装扮及专属动作。\n- 新增「偷偷打游戏」「吹泡泡」「魔法变身」待机动作。\n- 新增装饰翻页，统一装饰预览样式。\n- 完善快速敲击时的动画衔接。\n- 自动检查更新功能已通过实机验证，更新时直接安装到原位置。\n- 精简设置说明，关于页面增加作者及仓库链接。"
 }
