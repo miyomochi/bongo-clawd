@@ -26,6 +26,7 @@ def gh(*args, payload=None):
 def api(path):
     return json.loads(gh('api', 'repos/'+repo+'/'+path))
 
+assert api('git/ref/heads/release/beta-0.4.0')['object']['sha'] == commit, 'Superseded build cannot publish'
 stable = api('contents/updates/latest.json?ref=main')['sha']
 before = api('contents/updates/beta.json?ref=main')
 old = json.loads(base64.b64decode(before['content']))

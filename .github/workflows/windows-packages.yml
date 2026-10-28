@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 jobs:
   package:
     runs-on: windows-latest
@@ -12,6 +13,19 @@ jobs:
     env:
       PYTHONUTF8: 1
     steps:
+      - name: Cancel superseded beta builds
+        if: github.ref_name == 'release/beta-0.4.0'
+        continue-on-error: true
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $runs = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs?branch=release/beta-0.4.0&status=in_progress" | ConvertFrom-Json
+          foreach ($run in $runs.workflow_runs) {
+            if ($run.id -ne [long]$env:GITHUB_RUN_ID -and $run.head_sha -ne $env:GITHUB_SHA) {
+              gh run cancel $run.id --repo $env:GITHUB_REPOSITORY
+            }
+          }
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -66,4 +80,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/publish-next-beta.py
-
