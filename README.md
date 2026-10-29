@@ -19,7 +19,7 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 当前稳定版：**0.4.0**，支持 **Windows 10 / 11 x64**。
 
-自动检查更新功能已通过作者实机验证。
+自动检查更新功能已通过作者验证。有bug请联系我。
 
 [最新稳定版](https://github.com/miyomochi/bongo-clawd/releases/latest) · [全部版本与历史下载](https://github.com/miyomochi/bongo-clawd/releases)
 
