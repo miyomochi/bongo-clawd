@@ -1,5 +1,12 @@
 # Bongo Clawd
 
+[![最新版本](https://img.shields.io/github/v/release/miyomochi/bongo-clawd?label=release&color=d97757&style=flat)](https://github.com/miyomochi/bongo-clawd/releases/latest)
+![Windows 10 / 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078d4?style=flat)
+[![Tauri 2](https://img.shields.io/badge/Tauri-2-24c8d8?style=flat&logo=tauri&logoColor=white)](https://v2.tauri.app/)
+[![Rust](https://img.shields.io/badge/Rust-dea584?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?style=flat&logo=javascript&logoColor=333333)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![SVG](https://img.shields.io/badge/SVG-ffb13b?style=flat&logo=svg&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/SVG)
+
 ![Clawd 戴着天蓝耳机敲键盘，开心地冒出爱心泡](docs/assets/clawd-demo.gif)
 
 基于 bongo cat 灵感所构建的Clawd小桌宠，个人自娱自乐产物😽让Clawd来陪你码字吧！
@@ -10,11 +17,11 @@
 
 Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击键盘都有动作映射(尚未做到对多种型号键盘不同键位的适配orz)。详情可看下方介绍。
 
-当前稳定版：**0.3.0**，支持 **Windows 10 / 11 x64**。
+当前稳定版：**0.4.0**，支持 **Windows 10 / 11 x64**。
 
-0.3.0 与 0.3.1-beta 已修复已知问题。
+自动检查更新功能已通过作者实机验证。
 
-[最新稳定版](https://github.com/miyomochi/bongo-clawd/releases/latest) · [Beta 试验版](https://github.com/miyomochi/bongo-clawd/releases/tag/v0.3.1-beta) · [全部版本与历史下载](https://github.com/miyomochi/bongo-clawd/releases)
+[最新稳定版](https://github.com/miyomochi/bongo-clawd/releases/latest) · [全部版本与历史下载](https://github.com/miyomochi/bongo-clawd/releases)
 
 ## 先试试看
 
@@ -24,13 +31,13 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 ## 下载与使用
 
-**Windows 安全提示**：这是个人同好项目，暂未购买代码签名证书(对我来说有点昂贵了TT)。安装包及便携版中的 EXE 未进行数字签名，Windows 可能进行警告，**想使用要在更多信息里允许一下**。只是请确认文件来自本仓库，并按需核对 [SHA-256 校验值](downloads/SHA256SUMS.txt)，再自行决定是否运行。
+**Windows 安全提示**：这是个人同好项目，暂未购买代码签名证书(对我来说有点昂贵了TT)。安装包及便携版中的 EXE 未进行数字签名，Windows 可能进行警告，**想使用要在更多信息里允许一下**。只是请确认文件来自本仓库，并按需核对 [SHA-256 校验值](https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0/SHA256SUMS.txt)，再自行决定是否运行。
 
-1. 下载对应版本 [Windows x64 安装包]。
-2. 解压后运行 `Bongo-Clawd-0.3.0-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
+1. 下载 [Windows x64 安装包（ZIP）](https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0/Bongo-Clawd-0.4.0-Windows-x64-Setup.zip)。
+2. 解压后运行 `Bongo-Clawd-0.4.0-Windows-x64-Setup.exe`，选择安装目录，默认创建桌面快捷方式。
 3. 若使用版本未引入自动更新,需要先卸载旧版,再手动安装新版,个人设置会保留。
 
-此为压缩包版,解压后在文件内双击EXE启动,按需取用[便携版运行包（免安装 ZIP）](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.0/Bongo-Clawd-0.3.0-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。
+此为压缩包版,解压后在文件内双击EXE启动,按需取用[便携版运行包（免安装 ZIP）](https://github.com/miyomochi/bongo-clawd/releases/download/v0.4.0/Bongo-Clawd-0.4.0-Windows-x64.zip)，完整解压后双击 `Bongo-Clawd.exe`。
 
 ！运行该程序需要系统已安装 Microsoft Edge WebView2 Runtime。若提示缺少运行时，可从 [微软官方页面](https://developer.microsoft.com/microsoft-edge/webview2/) 安装 Evergreen Runtime。
 
@@ -90,7 +97,7 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 - 暂停、打开调整菜单或锁屏时不累计；隐藏到托盘仍累计。
 - 次数与速度仅保存在内存中，关闭统计或完全退出程序即清零，不跨次保存。
 
-仅在「检查更新」时联网查询公开版本信息；检测到新版后，由你确认是否进行下载。
+手动检查更新，或开启自动检查更新后的每天首次启动时，会联网查询公开版本信息；检测到新版后，由你确认是否进行下载。
 
 键鼠事件只用于本地动画与上述聚合计数。**不解析输入文字、不读取剪贴板、不保存按键历史、不上传输入。** 
 
@@ -115,8 +122,6 @@ Clawd获得一个桌面小工位！可以陪你敲键盘，移动鼠标和敲击
 
 ### 发布通道
 
-- **稳定版 0.3.0**：可选的小幅手臂方向感，以及正式采用的戳一戳互动。保留手动检查更新。
-- **beta 0.3.1-beta**：包含稳定版功能。额外增加自动检查、下载校验、安装与动画。未经实机试验更新功能。
+- **稳定版 0.4.0**：新增牛仔帽、侦探帽、偷偷打游戏、吹泡泡与魔法变身；包含自动检查更新、下载校验与原位置安装。
+- 旧版 Beta 保留在 [历史发布](https://github.com/miyomochi/bongo-clawd/releases) 中，当前推荐使用正式版。
 - 稳定版只读取正式更新，不会主动切换到 beta。
-
-所选择试验版,有bug请与我反馈。 **不稳定 Beta 0.3.1-beta**：[安装包](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.1-beta/Bongo-Clawd-0.3.1-beta-Windows-x64-Setup.zip) · [免安装包](https://github.com/miyomochi/bongo-clawd/releases/download/v0.3.1-beta/Bongo-Clawd-0.3.1-beta-Windows-x64.zip)。Beta 与稳定版共用安装目录和配置，替换使用。[功能、检查结果及当前限制](docs/BETA-0.3.1-beta.md)。
